@@ -1,0 +1,12 @@
+<?php
+include_once 'private/siteinfo.php';
+
+function urlCheck($url) {
+  $array = explode('/', $url);
+  $urlPage = $array[(count($array) - 1)];
+  return $urlPage == 'create.php' ? 'box-shadow' : '';
+}?>
+
+<div class="header <?= urlCheck($_SERVER['REQUEST_URI']) ?> ">
+  <h2><?= $site['name'] ?></h2>
+</div>

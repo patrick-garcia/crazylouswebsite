@@ -1,0 +1,201 @@
+/* login */
+.login-bg-color {
+  background: linear-gradient(to right top, #ededed, #ededee, #ecedef, #eaedf0, #e8eef1, #e8eff2, #e8f1f3, #e8f2f4, #eaf5f7, #ebf7f9, #edfafc, #effcff) fixed;
+}
+
+#login-container {
+  position: relative;
+}
+
+#login-container > div > div {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#login-container h2 {
+  background: linear-gradient(to right top, #3d607d, #3f6687, #406c91, #42739c, #4479a6, #437cac, #427fb2, #4182b8, #3d82bb, #3981bf, #3481c2, #3080c5);
+  color: white;
+  font-family: 'Indie Flower', cursive;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#login-container div.card {
+  padding-bottom: 3rem !important;
+  background: rgba(255,255,255,.9);
+}
+
+#new-user {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* profile */
+.edit-btn {
+  margin: 32px 0 0 12px;
+  min-width: 160px;
+}
+
+/* albums */
+.table-borderless td,
+.table-borderless th {
+  border: 0;
+}
+
+#albums-container button[name="sortsubmit"] {
+  margin-top: 36px;
+  box-shadow: none;
+}
+
+#albums-container div.sort-filter {
+  margin-bottom: 30px;
+}
+
+#albums-container div.card {
+  margin-bottom: 30px;
+}
+
+.cart {
+  width: 225px;
+  z-index: 3;
+  position: fixed;
+  right: 3%;
+  top: 12%;
+  background: rgba(200, 200, 200, .7);
+  border: 1px solid darkgrey !important;
+  text-align: center;
+}
+
+#albums-container div.album-card {
+  position: relative;
+  min-height: 366px;
+}
+
+#albums-container div.album-card a {
+  position: absolute;
+  bottom: 10%;
+  right: 12%;
+}
+
+#albums-container button[name="sortsubmit"] {
+  min-width: 80px;
+}
+
+/* order */
+#order-container thead tr th:first-child {
+  padding-left: 28px
+}
+
+#summary th {
+  border-top: none;
+}
+
+#lineItemTotal::before, #subtotal::before, #tax::before, #finalTotal::before {
+  content: '$';
+}
+
+#total-container {
+  padding-left: 50px;
+}
+
+#order-btns {
+  padding: 20px 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* payment */
+form[name="payment"] {
+  box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.2);
+  margin: 0 -15px;
+}
+
+.payment-order-summary {
+  padding-top: 36px;
+  margin: 0 0 50px 0;
+}
+
+#clear-header {
+  position: relative;
+}
+
+#clear-header button {
+  position: absolute;
+  right: 3%;
+  top: 25%;
+  box-shadow: none;
+}
+
+#pay-btn a {
+  min-width: 124px;
+}
+
+/* order complete */
+#paycomplete-container {
+  position: relative;
+  height: 75vh;
+}
+#paycomplete-container > div > div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+#paycomplete-container .card {
+  margin: 15px 0;
+}
+
+#paycomplete-container .card-body {
+  padding: 20px;
+}
+
+#paycomplete-container i.fa-check-circle {
+  margin: 20px;
+}
+
+#paycomplete-container hr {
+  width: 90%;
+  margin: 1rem auto;
+}
+
+#paycomplete-container ul {
+  display: flex;
+  justify-content: space-around;
+  padding: 0;
+  width: 45%;
+  margin: 0 auto;
+}
+
+.limegreen {
+  color: limegreen;
+}
+
+/* history */
+#history-container div.card {
+  min-height: 50vh;
+}
+
+#history-table {
+  margin-bottom: 0;
+}
+
+#history-table th:first-child {
+  padding-left: 1.5rem; /* 1.5 to match td bootstrap default */
+}
+
+/* msg */
+.frown-font-awesome::after {
+  content: "\f119";
+  font-family: "Font Awesome 5 Free";
+}
+
+.happy-font-awesome::after {
+  content: "\f118";
+  font-family: "Font Awesome 5 Free";
+}
