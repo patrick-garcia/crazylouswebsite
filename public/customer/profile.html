@@ -1,0 +1,192 @@
+<?= successMsg() ?>
+
+<div class="container container-min-height" id="profile-container">
+  <div class="col-md-12">
+    <div class="card box-shadow p-4 text-secondary">
+      <div class="row mt-3 mx-4">
+        <h3 class="">My Profile</h3>
+      </div> <!-- end of h2 div -->
+      <form action="" method="POST" class="m-4">
+      <?php
+        global $con;
+        moreResCheck($con);
+        $result = $con->query("CALL profile_load_user($id)") or die($con->error);
+        while ($row = $result->fetch_assoc()): ?>
+        
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="firstname">First Name</label>
+            <input type="text" class="form-control" name="firstname" placeholder="first name"
+              value="<?= (isset($_POST['firstname']) && $edtTgl['name'] == 1) ? $_POST['firstname'] : $row['firstname']; ?>"
+              <?= readonly($edtTgl['name']) ?> >
+            <?= errorIssetCheck('firstname'); ?>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="lastname">Last Name</label>
+            <input type="text" class="form-control" name="lastname" placeholder="last name"
+              value="<?= (isset($_POST['lastname']) && $edtTgl['name'] == 1) ? $_POST['lastname'] : $row['lastname']; ?>"
+              <?= readonly($edtTgl['name']) ?> >
+            <?= errorIssetCheck('lastname'); ?>
+          </div>
+          <div class="form-group col-md-1">
+            <?= displayEditBtnToggle($edtTgl['name'], 'edit_name', 'edit name & email', 'save_name', 'save') ?>
+          </div> <!-- end of btn -->
+        </div> <!-- end of name row -->
+
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" name="email" placeholder="email"
+              value="<?= (isset($_POST['email']) && $edtTgl['name'] == 1) ? $_POST['email'] : $row['email']; ?>"
+              <?= readonly($edtTgl['name']) ?> >
+            <?= (isset($errors['email'])) ? '<p class="text-danger small">' . $errors['email'] . '</p>' : ''; ?>
+          </div>
+        </div> <!-- end of email row -->
+
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" password="password" placeholder="password" name="pass1"
+              value="<?= $row['password']; ?>" <?= readonly($edtTgl['pass']) ?> >
+            <?php
+              echo errorIssetCheck('pass1');
+              if (isset($errors['passCheck']) && !isset($errors['pass1']) && !isset($errors['pass2'])) {
+                echo '<p class="text-danger small">' . $errors['passCheck'] . '</p>';
+              }
+            ?>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="password">Confirm Password</label>
+            <input type="password" class="form-control" password="password" placeholder="password" name="pass2"
+              value="<?= $row['password']; ?>" <?= readonly($edtTgl['pass']) ?> >
+            <?= errorIssetCheck('pass2'); ?>
+          </div>
+          <div class="form-group col-md-1">
+            <?= displayEditBtnToggle($edtTgl['pass'], 'change_pass', 'change password', 'save_pass', 'save') ?>
+          </div> <!-- end of btn -->
+        </div> <!-- end of password row -->
+      <?php endwhile; ?> <!-- end of while loop -->
+
+        <div class="dropdown-divider"></div>
+      
+      <!-- address section -->
+      <?php
+        global $con;
+        moreResCheck($con);
+        $result = $con->query("CALL profile_load_address($id)") or die($con->error);
+        while ($row = $result->fetch_assoc()): ?>
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="address">Address</label>
+            <input type="text" class="form-control" name="address" placeholder="address"
+            value="<?= (isset($_POST['address']) && $edtTgl['adrs'] == 1) ? $_POST['address'] : $row['street']; ?>"
+            <?= readonly($edtTgl['adrs']) ?> >
+            <?= errorIssetCheck('address'); ?>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="suite">Suite</label>
+            <input type="text" class="form-control" name="suite" placeholder="suite"
+            value="<?= (isset($_POST['suite']) && $edtTgl['adrs'] == 1) ? $_POST['suite'] : $row['suite']; ?>"
+            <?= readonly($edtTgl['adrs']) ?> >
+          </div>
+          <div class="form-group col-md-1">
+            <?= displayEditBtnToggle($edtTgl['adrs'], 'edit_adrs', 'edit address', 'save_adrs', 'save'); ?>
+          </div> <!-- end of btn -->
+        </div> <!-- end of address row -->
+
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="city">City</label>
+            <input type="text" class="form-control" name="city" placeholder="city"
+            value="<?= (isset($_POST['city']) && $edtTgl['adrs']) ? $_POST['city'] : $row['city']; ?>" <?= readonly($edtTgl['adrs']) ?> >
+            <?= errorIssetCheck('city'); ?>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="province">Province</label>
+            <select name="province" class="form-control" <?= readonly($edtTgl['adrs']) ?> >
+              <?php
+                global $provinces;
+                foreach($provinces as $val) {
+                  $selectedVal = ($val == $row['province']) ? 'selected'  : '';
+                  echo '<option ' . $selectedVal . ' value="' . $val . '">' . $val . '</option>';
+              }?>
+            </select>
+          </div> <!-- end of province -->
+          <div class="form-group col-md-2">
+            <label for="postal">Postal Code</label>
+            <input type="text" class="form-control" name="postal" placeholder="postal code"
+            value="<?= (isset($_POST['postal']) && $edtTgl['adrs']) ? $_POST['postal'] : $row['postal']; ?>"
+            <?= readonly($edtTgl['adrs']) ?> >
+            <?= errorIssetCheck('postal'); ?>
+          </div> <!-- end of postal -->
+          <div class="form-group col-md-2">
+            <label for="country">Country</label>
+            <select name="country" class="form-control" <?= readonly($edtTgl['adrs']) ?> >
+              <?php
+                global $countries;
+                foreach($countries as $key => $val) {
+                  $selectedVal = ($val == $row['country']) ? 'selected'  : '';
+                  echo '<option ' . $selectedVal . ' value="' . $val . '">' . $key . '</option>';
+              }?>
+            </select>
+          </div> <!-- end of country -->
+        </div> <!-- end of city, prov, postal, country row -->
+      <?php endwhile; ?>
+
+        <div class="dropdown-divider"></div>
+      
+      <?php
+        global $con;
+        moreResCheck($con);
+        $result = $con->query("CALL profile_load_phone($id)") or die($con->error);
+        $phonecounter = 1;
+        while($row = $result->fetch_assoc()):
+      ?>
+        <input type="hidden" name="<?= 'phoneid' . $phonecounter ?>" value="<?= $row['id'] ?>"> <!-- hidden val to get phone id -->
+        <div class="form-row">
+          <div class="form-group col-md-3">
+            <label for="phone">Phone</label>
+            <?php $phoneinput = 'phoneinput' . $phonecounter; ?>
+            <input type="text" class="form-control" placeholder="phone number"
+              name="<?= $phoneinput ?>" <?= readonly($edtTgl['phone']); ?>
+              value="<?= (isset($_POST[$phoneinput]) && $edtTgl['phone']) ? $_POST[$phoneinput] : $row['number'] ?>" >
+            
+            <?php
+              if(isset($errors[$phoneinput])) {
+                echo '<p class="text-danger small">* required field</p>';
+              } else {
+                $phonelength = 'phonenum' . $phonecounter . 'Len';
+                if (isset($errors[$phonelength])) {
+                  echo '<p class="text-danger small">* 10 digits required</p>' . $phonecounter;
+            }}?>
+          </div> <!-- end of phone field -->
+          <div class="form-group col-md-1">
+            <label for="ext">Ext</label>
+            <input type="text" class="form-control" placeholder="optional" name="<?= 'ext' . $phonecounter ?>" <?= readonly($edtTgl['phone']); ?>
+            value="<?= $row['ext']; ?>">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="phonetype">Type</label>
+            <select name="<?= 'phonetype' . $phonecounter ?>" class="form-control" <?= readonly($edtTgl['phone']) ?> >
+              <?php
+                global $phonetype;
+                foreach($phonetype as $key => $val) {
+                  $selectedVal = ($val == $row['type']) ? 'selected'  : '';
+                  echo '<option ' . $selectedVal . ' value="' . $val . '">' . $key . '</option>';
+              }?>
+            </select>
+          </div> <!-- end of phone option -->
+          <div class="form-group col-md-1">
+            <?php
+              if($phonecounter == 1) {
+                echo displayEditBtnToggle($edtTgl['phone'], 'edit_phone', 'edit phone', 'save_phone', 'save');
+                $phonecounter++;
+            }?>
+          </div> <!-- end of btn -->
+        </div> <!-- end of phone form row -->
+      <?php endwhile; ?>
+      </form> <!-- end of form -->
+    </div> <!-- end of card -->
+  </div> <!-- end of col -->
+</div> <!-- end of container -->

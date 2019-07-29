@@ -1,0 +1,75 @@
+<?= errorMsg() ?>
+
+<div class="container container-min-height" id="order-container">
+  <div class="card box-shadow p-3">
+    <div class="card-header pl-4 text-center box-shadow mb-4">
+      <h4 class="text-secondary mb-0">Order Summary</h4>
+    </div>
+    <table class="table" id="summary">
+      <thead class="">
+        <tr>
+          <?php
+            $heading = ['album', 'artist', 'quantity', 'price'];
+            foreach($heading as $val) echo '<th class="font-weight-light">' . $val . '</th>'; ?>
+        </tr>
+      </thead>
+      <tbody class="text-secondary">
+        <?php
+          $startSubTotal = 0;
+          foreach($order as $key => $val):
+            $startSubTotal = $startSubTotal + $val['price'];
+        ?>
+          <tr>
+            <td class="pl-4"><?= $val['album'] ?></td>
+            <td><?= $val['artist'] ?></td>
+            <td>
+              <select class="form-control w-50 qtyOfEachItem" id="" name="qtyAlbum<?= $key + 1 ?>">
+                <?= qty_load() ?>
+              </select>
+              <input type="hidden" class="hiddenQty" name="qtyHidden<?= $key + 1 ?>" value=1>
+            </td>
+            <td name="linePrice<?= $key + 1 ?>"><?= $val['price'] ?></td>
+            <input type="hidden" class="hiddenUnitPrice" name="linePriceHidden<?= $key + 1 ?>" value="<?= $val['price'] ?>">
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+    <?= empty($order) ? '<span class="text-center py-4 text-secondary">no album selected</span>' : '' ?>
+    <div class="card-footer"></div>
+
+    <form action="" method="POST">
+      <!-- ***** -->
+      <input type="hidden" id="qtyhidden" name="itemqty">
+      <input type="hidden" id="totals" name="totals">
+      <!-- ***** -->
+      <div class="card-body col-md-4 offset-7" id="total-container">
+        <table class="table table-borderless text-secondary">
+          <tbody>
+            <tr>
+              <th scope="col" class="text-right text-secondary">subtotal:</th>
+              <td scope="col" class="totalItems text-right" id="subtotal"><?= $startSubTotal ?></td>
+            </tr>
+            <tr>
+              <th class="text-right text-secondary">tax (13%):</th>
+              <td class="totalItems text-right" id="tax"><?= number_format($startSubTotal * 0.13, 2) ?></td>
+            </tr>
+            <tr>
+              <th class="text-right text-secondary">total:</th>
+              <td class="totalItems text-right" id="finalTotal"><?= number_format($startSubTotal * 1.13, 2) ?></td>
+              <input type="hidden" id="finalTotalHidden" name="finalTotalHidden" value="<?= $price * 1.13 ?>">
+            </tr>
+          </tbody>
+        </table>
+        <div class="card-body" id="order-btns">
+          <a href="albums.php" class="btn btn-outline-primary mr-3" name="">go to albums</a>
+          <button class="btn btn-success text-right" name="placeorder" <?= disableBtn($order) ?> >place order</button>
+        </div>
+      </div> <!-- end of card-body -->
+    </form>
+  </div> <!-- end of card -->
+</div> <!-- end of container -->
+
+<?php include 'public/template/footer.html' ?>
+
+<!-- **** -->
+<script type="text/javascript" src="js/order.js"></script>

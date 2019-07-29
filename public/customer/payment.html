@@ -1,0 +1,158 @@
+<?= errorMsg() ?>
+
+<div class="container container-min-height text-secondary">
+  <div class="row">
+    <div class="card col-md-12 payment-order-summary box-shadow">
+      <h6 class="text-secondary text-center mb-3">Order Summary</h6>
+      <div class="row">
+        <div class="col-md-6">
+          <table class="table font-weight-light">
+            <?= empty($orderDetails) ? '<tr class="text-center"><td>order incomplete</td></tr>' : '' ?>
+            <?php foreach($orderDetails as $key => $val): ?>
+            <tr>
+              <td><?= ($key + 1) . ': "' . $val['album'] . '"' . ' by ' . $val['artist'] . ' ~ qty: ' . $val['qty'] ?></td>
+            </tr>
+            <?php endforeach; ?>
+          </table>
+        </div>
+        <div class="col-md-6">
+          <table class="table font-weight-light">
+            <td>subtotal: $<?= payTotalsCheck('sub') ?></td>
+            <td>tax: $<?= payTotalsCheck('tax') ?></td>
+            <td>total: $<?= payTotalsCheck('total') ?></td>
+          </table>
+        </div> <!-- end of col -->
+      </div>
+    </div> <!-- end of card -->
+  </div> <!-- end of row -->
+
+  <form action="" method="POST" name="payment" class="p-4">
+    <div class="row">
+      <div class="card col-md-6">
+        <div class="card-header box-shadow text-secondary mx-3" id="clear-header">
+          <h4 class="">Payment</h4>
+          <button class="btn btn-sm btn-outline-primary" onclick="event.preventDefault(); clearPayFields();">clear</button>
+        </div>
+        <div class="form-row mt-4">
+          <div class="form-group col-md-10 offset-1">
+            <label for="cardname">name on credit card</label>
+            <input type="text" class="form-control pay-input" name="cardname" placeholder="cardholder name">
+            <?= errorIssetCheck('cardname') ?>
+          </div>
+        </div> <!-- end of name form-row -->
+
+        <div class="form-row">
+          <div class="form-group col-md-6 offset-1">
+            <label for="cardnum">credit card number</label>
+            <input type="text" class="form-control pay-input" name="cardnum" placeholder="card number">
+            <?= errorIssetCheck('cardnum') ?>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="cardtype">credit card type</label>
+            <select name="cardtype" id="" class="form-control">
+              <?= cardsOptions() ?>
+            </select>
+          </div>
+        </div> <!-- end of cc # form-row -->
+
+        <div class="form-row">
+          <div class="form-group col-md-6 offset-1">
+            <label for="expiry">expiry date</label>
+            <div class="input-group">
+              <select name="cardmonth" id="" class="form-control mr-3">
+                <?= cardmonthLoad() ?>
+              </select>
+              <select name="cardyear" id="" class="form-control">
+                <?= cardyearLoad() ?>
+              </select>
+            </div>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="csv">security code</label>
+            <input type="text" class="form-control pay-input" name="csv" placeholder="csv">
+            <?= errorIssetCheck('csv') ?>
+          </div>
+        </div> <!-- end of expiry row -->
+      </div> <!-- end of card -->
+
+<?php
+  $shipAdrsId = $_SESSION['loggedID'];
+  global $con; $con->next_result();
+  $sql = "CALL payment_load_address($shipAdrsId)";
+  $ship_res = $con->query($sql)->fetch_assoc();
+?>
+      <div class="card col-md-6">
+        <div class="card-header box-shadow text-secondary mx-3">
+          <h4 class="">Ship To Address</h4>
+        </div>
+        <div class="form-row mt-4">
+          <div class="form-group col-md-8 offset-1">
+            <label for="ship-adrs">address</label>
+            <input type="text" class="form-control ship-info" name="ship-adrs" placeholder="address" readonly value="<?= $ship_res['street'] ?>">
+            <?= errorIssetCheck('ship-adrs') ?>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="ship-ste">suite</label>
+            <input type="text" class="form-control ship-info" name="ship-ste" placeholder="suite" value="<?= $ship_res['suite'] ?>">
+          </div>
+        </div> <!-- end of address, suite form-row -->
+        <div class="form-row">
+          <div class="form-group col-md-6 offset-1">
+            <label for="ship-city">city</label>
+            <input type="text" class="form-control ship-info" name="ship-city" placeholder="city" value="<?= $ship_res['city'] ?>">
+            <?= errorIssetCheck('ship-city') ?>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="ship-prov">province</label>
+            <!-- <input type="text" class="form-control" name="ship-prov" placeholder="province"> -->
+            <select class="form-control ship-info" name="ship-prov">
+              <?php
+                global $provinces;
+                foreach($provinces as $val) {
+                  $selectedVal = ($val == $ship_res['province']) ? 'selected'  : '';
+                  echo '<option ' . $selectedVal . ' value="' . $val . '">' . $val . '</option>';
+              }?>
+            </select>
+          </div>
+        </div> <!-- end of city, prov form-row -->
+        <div class="form-row">
+          <div class="form-group col-md-3 offset-1">
+            <label for="ship-post">postal code</label>
+            <input type="text" class="form-control ship-info" name="ship-post" placeholder="postal code" value="<?= $ship_res['postal'] ?>">
+            <?= errorIssetCheck('ship-post') ?>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="ship-ctry">country</label>
+            <!-- <input type="text" class="form-control" name="ship-ctry" placeholder="country"> -->
+            <select class="form-control ship-info" name="ship-ctry">
+              <?php
+                global $countries;
+                foreach($countries as $key => $val) {
+                  $selectedVal = ($val == $ship_res['country']) ? 'selected'  : '';
+                  echo '<option ' . $selectedVal . ' value="' . $val . '">' . $key . '</option>';
+              }?>
+            </select>
+          </div>
+        </div> <!-- end of post, country form-row -->
+      
+        <div class="form-check">
+          <div class="form-group offset-1">
+            <input type="checkbox" class="form-check-input" id="addressCheckbox" name="adrschkbox">
+            <label class="form-check-label" for="adrschkbox">use different address</label>
+          </div>
+        </div> <!-- end of checkbox -->
+      </div> <!-- end of card -->
+    </div> <!-- end of row-->
+    <div class="row my-4">
+      <div class="form-group offset-8" id="pay-btn">
+        <a href="order.php" class="btn btn-outline-primary mr-3">go to order</a>
+        <button type="submit" class="btn btn-success" name="confirmOrder" <?= disableBtn($orderDetails) ?> >confirm order</button>
+      </div>
+    </div> <!-- end of btn row-->
+  </form>
+</div> <!-- end of container -->
+
+<?php include 'public/template/footer.html' ?>
+
+<!-- **** -->
+<script type="text/javascript" src="js/payment.js"></script>
