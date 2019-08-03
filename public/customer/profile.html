@@ -68,6 +68,48 @@
       <?php endwhile; ?> <!-- end of while loop -->
 
         <div class="dropdown-divider"></div>
+
+      <!-- ********************* -->
+      <?php
+        global $con;
+        moreResCheck($con);
+        $result = $con->query("CALL profile_load_secretquestion($id)") or die($con->error);
+      ?>
+      <?php while($row = $result->fetch_assoc()): ?>
+        <div class="form-row">
+          <div class="form-group col-md-8">
+            <label for="securityquestion">Security Question</label>
+            <select class="form-control" name="securityquestion" <?= readonly($edtTgl['question']) ?> >
+              <?php
+                global $secretquestion;
+                foreach($secretquestion as $key => $val) {
+                  $selectedVal = $val == $row['questionid'] ? 'selected' : '';
+                  $string = '<option ' . $selectedVal . ' value="';
+                  $string .= $val;
+                  $string .= '">' . $key . '</option>';
+                  echo $string;
+              }?>
+            </select>
+          </div>
+
+          <div class="form-group col-md-1">
+            <?= displayEditBtnToggle($edtTgl['question'], 'edit_question', 'edit question', 'save_question', 'save') ?>
+          </div> <!-- end of btn -->
+
+        </div> <!-- end of question row -->
+        <div class="form-row">
+          <div class="form-group col-md-8">
+            <label for="securityanswer">Answer to Security Question</label>
+            <input type="text" class="form-control" name="securityanswer" placeholder="answer to security question"
+              value="<?= $row['answer'] ?>"
+              <?= readonly($edtTgl['question']) ?> >
+            <?= errorIssetCheck('securityanswer') ?>
+          </div>
+        </div><!-- end of answer row -->
+      <?php endwhile; ?>
+      <!-- ********************* -->
+        
+        <div class="dropdown-divider"></div>
       
       <!-- address section -->
       <?php
@@ -177,7 +219,7 @@
               }?>
             </select>
           </div> <!-- end of phone option -->
-          <div class="form-group col-md-1">
+          <div class="form-group col-md-1 offset-2">
             <?php
               if($phonecounter == 1) {
                 echo displayEditBtnToggle($edtTgl['phone'], 'edit_phone', 'edit phone', 'save_phone', 'save');

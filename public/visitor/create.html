@@ -1,3 +1,5 @@
+<?= pre_r($reg) ?>
+
 <div class="container container-min-height">
   <div class="col-md-12">
     <div class="card box-shadow p-4 text-secondary">
@@ -41,6 +43,26 @@
             <?= errorIssetCheck('pass2') ?>
           </div>
         </div> <!-- end of password row -->
+        
+        <div class="dropdown-divider"></div>
+        <!-- ********************* -->
+        <div class="form-row">
+          <div class="form-group col-md-8">
+            <label for="securityquestion">Security Question</label>
+            <select class="form-control" name="securityquestion" >
+              <?php foreach($secretquestion as $key => $val) echo '<option value="' . $val . '">' . $key .  '</option>'; ?>
+            </select>
+          </div>
+        </div> <!-- end of question row -->
+        <div class="form-row">
+          <div class="form-group col-md-8">
+            <label for="securityanswer">Answer to Security Question</label>
+            <input type="text" class="form-control" name="securityanswer" placeholder="answer to security question"
+              value="">
+            <?= errorIssetCheck('securityanswer') ?>
+          </div>
+        </div><!-- end of answer row -->
+
         <div class="dropdown-divider"></div>
         <div class="form-row">
           <div class="form-group col-md-6">
