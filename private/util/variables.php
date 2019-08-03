@@ -26,4 +26,12 @@ if(empty($phonetype)) {
     $phonetype[$row['display']] = $row['shortval'];
 }}
 
+$secretquestion = [];
+if(empty($secretquestion)) {
+  global $con; $con->next_result();
+  $question_res = $con->query("CALL securityquestions_load()");
+  while($row = $question_res->fetch_assoc()) {
+    $secretquestion[$row['question']] = $row['id'];
+}}
+
 ?>

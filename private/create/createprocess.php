@@ -6,6 +6,7 @@ include_once 'private/util/variables.php';
 include_once 'private/util/functions.php';
 
 !isset($reg) ? $reg = [] : '';
+!isset($regUtil) ? $regUtil = new regClass : '';
 
 if(isset($_POST['register'])) {
   $reg['fname'] = $_POST['firstname']; $reg['lname'] = $_POST['lastname'];
@@ -18,6 +19,13 @@ if(isset($_POST['register'])) {
   
   $reg['phone1'] = $_POST['phonenum1']; $reg['ext1'] = $_POST['ext1']; $reg['ptype1'] = $_POST['ptype1'];
   $reg['phone2'] = $_POST['phonenum2']; $reg['ext2'] = $_POST['ext2']; $reg['ptype2'] = $_POST['ptype2'];
+
+  // $reg['question'] = $_POST['securityquestion'];
+  // $reg['answer'] = $_POST['securityanswer'];
+  
+  $regUtil->question = $_POST['securityquestion'];
+  $regUtil->answer = $_POST['securityanswer'];
+
 
   validInput($reg['fname'], 'firstname');
   validInput($reg['lname'], 'lastname');
@@ -32,6 +40,9 @@ if(isset($_POST['register'])) {
   !empty($reg['phone2']) ? lenInputCheck($reg['phone2'], 10, 'phonenum2Len') : NULL;
   validPassword($reg['pword'], $reg['confirmPass'], 'passCheck');
 
+  // validInput($reg['answer'], 'securityanswer');
+  validInput($regUtil->answer, 'securityanswer');
+
   if(count($errors) < 1 ) {
     $lastID = insertCust($reg['fname'], $reg['lname'], $reg['email'], md5($reg['pword']));
     
@@ -44,7 +55,11 @@ if(isset($_POST['register'])) {
         if($phone1ValCheck > 0 && !empty($reg['phone2'])) {
           insertPhone($reg['phone2'], $reg['ext2'], $reg['ptype2'], $lastID);
         }
-    }}
+      }
+        
+      // insertUserQuestion($lastID, $reg['question'], $reg['answer']);
+      insertUserQuestion($lastID, $regUtil->question, $regUtil->answer);
+    }
     
     $_SESSION['message'] = 'your user account has been created... please login below ';
     unset($reg);
@@ -84,6 +99,14 @@ function insertPhone($num, $ext, $type, $custid) {
   $result = $con->query($sql);
 
   // yield val to check to proceed to NEXT phone
+  return $con->affected_rows ? $con->affected_rows : 0;
+}
+
+function insertUserQuestion($custid, $questionid, $answer) {
+  global $con; $con->next_result();
+  $sql = "CALL userquestion_insert('$custid', '$questionid', '$answer')";
+  $result = $con->query($sql);
+  // return below is not necessary
   return $con->affected_rows ? $con->affected_rows : 0;
 }
 

@@ -5,8 +5,9 @@ include_once 'profileutil.php';
 include_once 'private/util/variables.php';
 include_once 'private/util/functions.php';
 
-$edtTgl = ['name' => 0, 'pass' => 0, 'adrs' => 0, 'phone' => 0];
+$edtTgl = ['name' => 0, 'pass' => 0, 'adrs' => 0, 'phone' => 0, 'question' => 0];
 !isset($prf) ? $prf = [] : $prf;
+!isset($prf2) ? $prf2 = new profileClass : '';
 
 if(!isset($_SESSION['loggedID'])) {
   exit(header("location: index.php"));
@@ -150,5 +151,27 @@ function displayEditBtnToggle($editVal, $attr1, $text1, $attr2, $text2) {
   } else {
     return '<button type="submit" class="btn btn-success edit-btn" name="' . $attr2 . '">' . $text2 . '</button>';
 }}
+
+// edit security question
+if(isset($_POST['edit_question']) && $edtTgl['question'] == 0) {
+  $edtTgl['question'] = 1;
+}
+
+if(isset($_POST['save_question'])) {
+  $prf2->question = $_POST['securityquestion'];
+  $prf2->answer = $_POST['securityanswer']; validInput($prf2->answer, 'securityanswer');
+  
+  if(count($errors) > 0) {
+    $edtTgl['question'] = 1;
+
+  } else {
+    // saveName($prf['fname'], $prf['lname'], $prf['email'], $id);
+    $prf2->saveQuestion($prf2->question, $prf2->answer, $id);
+    $edtTgl['question'] = 0;
+    $_SESSION['message'] = 'your security has been updated ';
+    exit(header("location: profile.php"));
+    ob_end_flush();
+}}
+
 
 ?>

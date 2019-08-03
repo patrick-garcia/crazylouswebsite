@@ -36,6 +36,7 @@ if(isset($_POST['loginsubmit'])) {
     }}
 }}
 
+$_SESSION['prevUrl'] = $_SERVER['REQUEST_URI'];
 
 ?>
 
