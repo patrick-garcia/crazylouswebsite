@@ -4,19 +4,6 @@ function moreResCheck($conVal) {
   $conVal->more_results() ? $conVal->next_result() : NULL;
 }
 
-function clearfields() {
-  global $firstname, $lastname, $email, $password, $confirmPass, $address, $suite, $city, $province, $postal, $country, $phonenum1, $ext1, $ptype1, $phonenum2, $ext2, $ptype2;
-
-  $firstname = ''; $lastname = ''; $email = '';
-  $password = ''; $confirmPass = '';
-  $address = ''; $suite = ''; $city = '';
-  $province = ''; $postal = ''; $country = '';
-  $phonenum1 = ''; $ext1 = ''; $ptype1 = '';
-  $phonenum2 = ''; $ext2 = ''; $ptype2 = '';
-
-  $errors = [];
-}
-
  // error checks
 function validInput($input, $inputField) {
   global $errors;
@@ -72,9 +59,9 @@ function clearCart() {
 }
 
 function pre_r($array) {
-  echo "<pre>";
+  echo '<pre style="font-size: 12px;">';
   print_r($array);
-  echo "</pre>";
+  echo '</pre>';
 }
 
 function provinces_load() {

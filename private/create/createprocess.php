@@ -5,115 +5,72 @@ include_once 'createutil.php';
 include_once 'private/util/variables.php';
 include_once 'private/util/functions.php';
 
-!isset($reg) ? $reg = [] : '';
-!isset($regUtil) ? $regUtil = new regClass : '';
+!isset($userInfo) ? $userInfo = new NameClass : NULL;
+!isset($addr) ? $addr = new AddressClass : NULL;
+!isset($phone) ? $phone = new PhoneClass : NULL;
+!isset($security) ? $security = new SecurityQuestionClass : '';
 
 if(isset($_POST['register'])) {
-  $reg['fname'] = $_POST['firstname']; $reg['lname'] = $_POST['lastname'];
-  $reg['email'] = $_POST['email'];
-  $reg['pword'] = $_POST['pass1']; $reg['confirmPass'] = $_POST['pass2'];
+  $userInfo->fname = $_POST['firstname']; validInput($userInfo->fname, 'firstname');
+  $userInfo->lname = $_POST['lastname']; validInput($userInfo->lname, 'lastname');
+  $userInfo->email = $_POST['email']; validInput($userInfo->email, 'email');
+  $userInfo->password = $_POST['pass1']; validInput($userInfo->password, 'pass1');
+  $userInfo->confirmPass = $_POST['pass2']; validInput($userInfo->confirmPass, 'pass2');
+  validPassword($userInfo->password, $userInfo->confirmPass, 'passCheck');
 
-  $reg['adrs'] = $_POST['address']; $reg['ste'] = $_POST['suite'];
-  $reg['city'] = $_POST['city']; $reg['prov'] = $_POST['province'];
-  $reg['post'] = $_POST['postal']; $reg['ctry'] = $_POST['country'];
-  
-  $reg['phone1'] = $_POST['phonenum1']; $reg['ext1'] = $_POST['ext1']; $reg['ptype1'] = $_POST['ptype1'];
-  $reg['phone2'] = $_POST['phonenum2']; $reg['ext2'] = $_POST['ext2']; $reg['ptype2'] = $_POST['ptype2'];
+  $addr->adrs = $_POST['address']; validInput($addr->adrs, 'address');
+  $addr->ste = $_POST['suite'];
+  $addr->city = $_POST['city']; validInput($addr->city, 'city');
+  $addr->prov = $_POST['province'];
+  $addr->post = $_POST['postal']; validInput($addr->post, 'postal');
+  $addr->ctry = $_POST['country'];
 
-  // $reg['question'] = $_POST['securityquestion'];
-  // $reg['answer'] = $_POST['securityanswer'];
-  
-  $regUtil->question = $_POST['securityquestion'];
-  $regUtil->answer = $_POST['securityanswer'];
+  $phone->num1 = $_POST['phonenum1']; validInput($phone->num1, 'phonenum1');
+  lenInputCheck($phone->num1, 10, 'phonenum1Len');
+  $phone->ext1 = $_POST['ext1'];
+  $phone->type1 = $_POST['ptype1'];
 
+  $phone->num2 = $_POST['phonenum2'];
+  !empty($phone->num2) ? lenInputCheck($phone->num2, 10, 'phonenum2Len') : NULL;
+  $phone->ext2 = $_POST['ext2'];
+  $phone->type2 = $_POST['ptype2'];
 
-  validInput($reg['fname'], 'firstname');
-  validInput($reg['lname'], 'lastname');
-  validInput($reg['email'], 'email');
-  validInput($reg['pword'], 'pass1');
-  validInput($reg['confirmPass'], 'pass2');
-  validInput($reg['adrs'], 'address');
-  validInput($reg['city'], 'city');
-  validInput($reg['post'], 'postal');
-  validInput($reg['phone1'], 'phonenum1');
-  lenInputCheck($reg['phone1'], 10, 'phonenum1Len');
-  !empty($reg['phone2']) ? lenInputCheck($reg['phone2'], 10, 'phonenum2Len') : NULL;
-  validPassword($reg['pword'], $reg['confirmPass'], 'passCheck');
-
-  // validInput($reg['answer'], 'securityanswer');
-  validInput($regUtil->answer, 'securityanswer');
+  $security->question = $_POST['securityquestion'];
+  $security->answer = $_POST['securityanswer'];
+  validInput($security->answer, 'securityanswer');
 
   if(count($errors) < 1 ) {
-    $lastID = insertCust($reg['fname'], $reg['lname'], $reg['email'], md5($reg['pword']));
+    $lastID = $userInfo->insertCustomerInfo($userInfo->fname, $userInfo->lname, $userInfo->email, $userInfo->password);
     
     if($lastID > 0) {
-      $lastAddr = insertAddress($reg['adrs'], $reg['ste'], $reg['city'], $reg['prov'], $reg['post'], $reg['ctry'], $lastID);
+      // $lastAddr = $addr->insertAddress($addr->adrs, $addr->ste, $addr->city, $addr->prov, $addr->post, $addr->ctry, $lastID);
+      $lastAddr = $addr->insertAddress($addr->adrs, $addr->ste, $addr->city, $addr->prov, $addr->post, $addr->ctry);
       
-      if($lastAddr > 0 && (!empty($reg['phone1']))) {
-        $phone1ValCheck = insertPhone($reg['phone1'], $reg['ext1'], $reg['ptype1'], $lastID);
+      if($lastAddr > 0 && (!empty($phone->num1))) {
+        // $phone1ValCheck = $phone->insertPhone($phone->num1, $phone->ext1, $phone->type1, $lastID);
+        $phone1ValCheck = $phone->insertPhone($phone->num1, $phone->ext1, $phone->type1);
 
-        if($phone1ValCheck > 0 && !empty($reg['phone2'])) {
-          insertPhone($reg['phone2'], $reg['ext2'], $reg['ptype2'], $lastID);
+        if($phone1ValCheck > 0 && !empty($phone->num2)) {
+          // $phone->insertPhone($phone->num2, $phone->ext2, $phone->type2, $lastID);
+          $phone->insertPhone($phone->num2, $phone->ext2, $phone->type2);
         }
       }
         
-      // insertUserQuestion($lastID, $reg['question'], $reg['answer']);
-      insertUserQuestion($lastID, $regUtil->question, $regUtil->answer);
+      // $security->insertUserQuestion($lastID, $security->question, $security->answer);
+      $security->insertUserQuestion($security->question, $security->answer);
     }
     
     $_SESSION['message'] = 'your user account has been created... please login below ';
-    unset($reg);
     
     exit(header("location: index.php"));
     ob_end_flush();
 }};
 
-function getInsertedId($email) {
-  global $con; $con->next_result();
-    $sql = "CALL create_get_inserted_id('$email')";
-    $result = $con->query($sql);
-    while($row = $result->fetch_assoc()) {
-      return $row['lastid'];
-}}
-
-function insertCust($fn, $ln, $em, $pw) {
-  echo 'testtest';
-  global $con; $con->next_result();
-  $sql = "CALL insert_new_cust('$fn', '$ln', '$em', '$pw')";
-  if($result = $con->query($sql)) {
-    return getInsertedId($em);
-}}
-
-function insertAddress($adrs, $ste, $city, $prov, $postal, $ctry, $custid) {
-  global $con; $con->next_result();
-  $sql = "CALL insert_new_address('$adrs', '$ste', '$city', '$prov', '$postal', '$ctry', '$custid')";
-  $result = $con->query($sql);
-
-  // yield val to check to proceed to phone
-  return $con->affected_rows ? $con->affected_rows : 0;
+// load function
+function showInputVal($inputVal) {
+  return isset($inputVal) ? $inputVal : '';
 }
 
-function insertPhone($num, $ext, $type, $custid) {
-  global $con; $con->next_result();
-  $sql = "CALL insert_new_phone('$num', '$ext', '$type', '$custid')";
-  $result = $con->query($sql);
-
-  // yield val to check to proceed to NEXT phone
-  return $con->affected_rows ? $con->affected_rows : 0;
-}
-
-function insertUserQuestion($custid, $questionid, $answer) {
-  global $con; $con->next_result();
-  $sql = "CALL userquestion_insert('$custid', '$questionid', '$answer')";
-  $result = $con->query($sql);
-  // return below is not necessary
-  return $con->affected_rows ? $con->affected_rows : 0;
-}
-
-function inputCreateVal($val) {
-  global $reg;
-  return isset($reg[$val]) ? $reg[$val] : '';
-}
 
 ?>
 

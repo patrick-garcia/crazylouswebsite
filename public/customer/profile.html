@@ -2,52 +2,56 @@
 
 <div class="container container-min-height" id="profile-container">
   <div class="col-md-12">
-    <div class="card box-shadow p-4 text-secondary">
+    <div class="card box-shadow text-secondary">
       <div class="row mt-3 mx-4">
         <h3 class="">My Profile</h3>
       </div> <!-- end of h2 div -->
       <form action="" method="POST" class="m-4">
-      <?php
-        global $con;
-        moreResCheck($con);
-        $result = $con->query("CALL profile_load_user($id)") or die($con->error);
-        while ($row = $result->fetch_assoc()): ?>
-        
-        <div class="form-row">
-          <div class="form-group col-md-4">
-            <label for="firstname">First Name</label>
-            <input type="text" class="form-control" name="firstname" placeholder="first name"
-              value="<?= (isset($_POST['firstname']) && $edtTgl['name'] == 1) ? $_POST['firstname'] : $row['firstname']; ?>"
-              <?= readonly($edtTgl['name']) ?> >
-            <?= errorIssetCheck('firstname'); ?>
+
+      <?php foreach($loadprofile->nameArray as $key => $val): ?>  
+        <div id="name-section flex-column">
+          <div class="form-row">
+            <div class="form-group col-sm-12 col-md-5 col-lg-4">
+              <label for="firstname">First Name</label>
+              <input type="text" class="form-control" name="firstname" placeholder="first name"
+                value="<?= (isset($_POST['firstname']) && $edtTgl['name'] == 1) ? $_POST['firstname'] : $val['firstname']; ?>"
+                <?= readonly($edtTgl['name']) ?> >
+              <?= errorIssetCheck('firstname'); ?>
+            </div>
+            <div class="form-group col-sm-12 col-md-5 col-lg-4">
+              <label for="lastname">Last Name</label>
+              <input type="text" class="form-control" name="lastname" placeholder="last name"
+                value="<?= (isset($_POST['lastname']) && $edtTgl['name'] == 1) ? $_POST['lastname'] : $val['lastname']; ?>"
+                <?= readonly($edtTgl['name']) ?> >
+              <?= errorIssetCheck('lastname'); ?>
+            </div>
+            <div class="form-group col-lg-2" data-value="btn1">
+              <?= displayEditBtnToggle($edtTgl['name'], 'edit_name', 'edit name & email', 'save_name', 'save') ?>
+            </div> <!-- end of btn -->
+          </div> <!-- end -->
+
+          <div class="form-row">
+            <div class="form-group col-sm-12 col-md-5 col-lg-4">
+              <label for="email">Email</label>
+              <input type="email" class="form-control" name="email" placeholder="email"
+                value="<?= (isset($_POST['email']) && $edtTgl['name'] == 1) ? $_POST['email'] : $val['email']; ?>"
+                <?= readonly($edtTgl['name']) ?> >
+              <?= (isset($errors['email'])) ? '<p class="text-danger small">' . $errors['email'] . '</p>' : ''; ?>
+            </div>
+          </div> <!-- end of email -->
+
+          <div class="form-row mb-4" data-value="btn2">
+            <div class="form-group col-sm-3">
+              <?= displayEditBtnToggle($edtTgl['name'], 'edit_name', 'edit name & email', 'save_name', 'save') ?>
+            </div> <!-- end of btn -->
           </div>
-          <div class="form-group col-md-4">
-            <label for="lastname">Last Name</label>
-            <input type="text" class="form-control" name="lastname" placeholder="last name"
-              value="<?= (isset($_POST['lastname']) && $edtTgl['name'] == 1) ? $_POST['lastname'] : $row['lastname']; ?>"
-              <?= readonly($edtTgl['name']) ?> >
-            <?= errorIssetCheck('lastname'); ?>
-          </div>
-          <div class="form-group col-md-1">
-            <?= displayEditBtnToggle($edtTgl['name'], 'edit_name', 'edit name & email', 'save_name', 'save') ?>
-          </div> <!-- end of btn -->
-        </div> <!-- end of name row -->
+        </div> <!-- end of name section -->
 
         <div class="form-row">
-          <div class="form-group col-md-4">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" name="email" placeholder="email"
-              value="<?= (isset($_POST['email']) && $edtTgl['name'] == 1) ? $_POST['email'] : $row['email']; ?>"
-              <?= readonly($edtTgl['name']) ?> >
-            <?= (isset($errors['email'])) ? '<p class="text-danger small">' . $errors['email'] . '</p>' : ''; ?>
-          </div>
-        </div> <!-- end of email row -->
-
-        <div class="form-row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-sm-12 col-md-5 col-lg-4">
             <label for="password">Password</label>
             <input type="password" class="form-control" password="password" placeholder="password" name="pass1"
-              value="<?= $row['password']; ?>" <?= readonly($edtTgl['pass']) ?> >
+              value="<?= $val['password']; ?>" <?= readonly($edtTgl['pass']) ?> >
             <?php
               echo errorIssetCheck('pass1');
               if (isset($errors['passCheck']) && !isset($errors['pass1']) && !isset($errors['pass2'])) {
@@ -55,34 +59,33 @@
               }
             ?>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-sm-12 col-md-5 col-lg-4">
             <label for="password">Confirm Password</label>
             <input type="password" class="form-control" password="password" placeholder="password" name="pass2"
-              value="<?= $row['password']; ?>" <?= readonly($edtTgl['pass']) ?> >
+              value="<?= $val['password']; ?>" <?= readonly($edtTgl['pass']) ?> >
             <?= errorIssetCheck('pass2'); ?>
           </div>
-          <div class="form-group col-md-1">
+          <div class="form-group col-lg-2" data-value="btn1">
             <?= displayEditBtnToggle($edtTgl['pass'], 'change_pass', 'change password', 'save_pass', 'save') ?>
-          </div> <!-- end of btn -->
-        </div> <!-- end of password row -->
-      <?php endwhile; ?> <!-- end of while loop -->
+          </div> <!-- end of btn *** display: none/block toggle based on screen size -->
+        </div> <!-- end of row -->
+        <div class="form-row mb-4" data-value="btn2">
+          <div class="form-group col-sm-3">
+            <?= displayEditBtnToggle($edtTgl['pass'], 'change_pass', 'change password', 'save_pass', 'save') ?>
+          </div> <!-- end of btn *** display: none/block toggle based on screen size -->
+        </div> <!-- end of pass -->
+      <?php endforeach; ?> <!-- end of while loop -->
 
         <div class="dropdown-divider"></div>
 
       <!-- ********************* -->
-      <?php
-        global $con;
-        moreResCheck($con);
-        $result = $con->query("CALL profile_load_secretquestion($id)") or die($con->error);
-      ?>
-      <?php while($row = $result->fetch_assoc()): ?>
+      <?php foreach($loadprofile->secQuesArray as $row): ?>
         <div class="form-row">
-          <div class="form-group col-md-8">
+          <div class="form-group col-sm-12 col-md-6 col-lg-5">
             <label for="securityquestion">Security Question</label>
             <select class="form-control" name="securityquestion" <?= readonly($edtTgl['question']) ?> >
               <?php
-                global $secretquestion;
-                foreach($secretquestion as $key => $val) {
+                foreach($securityquestions as $key => $val) {
                   $selectedVal = $val == $row['questionid'] ? 'selected' : '';
                   $string = '<option ' . $selectedVal . ' value="';
                   $string .= $val;
@@ -90,61 +93,60 @@
                   echo $string;
               }?>
             </select>
-          </div>
+          </div> <!-- end of question group -->
 
-          <div class="form-group col-md-1">
-            <?= displayEditBtnToggle($edtTgl['question'], 'edit_question', 'edit question', 'save_question', 'save') ?>
-          </div> <!-- end of btn -->
-
-        </div> <!-- end of question row -->
-        <div class="form-row">
-          <div class="form-group col-md-8">
+          <div class="form-group col-sm-12 col-md-4 col-lg-3">
             <label for="securityanswer">Answer to Security Question</label>
             <input type="text" class="form-control" name="securityanswer" placeholder="answer to security question"
               value="<?= $row['answer'] ?>"
               <?= readonly($edtTgl['question']) ?> >
             <?= errorIssetCheck('securityanswer') ?>
-          </div>
-        </div><!-- end of answer row -->
-      <?php endwhile; ?>
+          </div> <!-- end of answer group -->
+
+          <div class="form-group col-lg-2" data-value="btn1">
+            <?= displayEditBtnToggle($edtTgl['question'], 'edit_question', 'edit question', 'save_question', 'save') ?>
+          </div> <!-- end of btn *** display: none/block toggle based on screen size -->
+        </div> <!-- end of question form row -->
+
+        <div class="form-row" data-value="btn2"> 
+          <div class="form-group col-sm-3">
+            <?= displayEditBtnToggle($edtTgl['question'], 'edit_question', 'edit question', 'save_question', 'save') ?>
+          </div> 
+        </div> <!-- end of btn *** display: none/block toggle based on screen size -->
+      <?php endforeach; ?>
       <!-- ********************* -->
         
         <div class="dropdown-divider"></div>
       
       <!-- address section -->
-      <?php
-        global $con;
-        moreResCheck($con);
-        $result = $con->query("CALL profile_load_address($id)") or die($con->error);
-        while ($row = $result->fetch_assoc()): ?>
-
+      <?php foreach($loadprofile->addrArray as $row): ?>
         <div class="form-row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-sm-12 col-md-6 col-lg-6">
             <label for="address">Address</label>
             <input type="text" class="form-control" name="address" placeholder="address"
             value="<?= (isset($_POST['address']) && $edtTgl['adrs'] == 1) ? $_POST['address'] : $row['street']; ?>"
             <?= readonly($edtTgl['adrs']) ?> >
             <?= errorIssetCheck('address'); ?>
           </div>
-          <div class="form-group col-md-2">
+          <div class="form-group col-6 col-sm-12 col-md-2 col-lg-2">
             <label for="suite">Suite</label>
             <input type="text" class="form-control" name="suite" placeholder="suite"
             value="<?= (isset($_POST['suite']) && $edtTgl['adrs'] == 1) ? $_POST['suite'] : $row['suite']; ?>"
             <?= readonly($edtTgl['adrs']) ?> >
           </div>
-          <div class="form-group col-md-1">
+          <div class="form-group col-lg-2" data-value="btn1">
             <?= displayEditBtnToggle($edtTgl['adrs'], 'edit_adrs', 'edit address', 'save_adrs', 'save'); ?>
-          </div> <!-- end of btn -->
+          </div> <!-- end of btn *** display: none/block toggle based on screen size -->
         </div> <!-- end of address row -->
 
         <div class="form-row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-sm-12 col-md-4 col-lg-4">
             <label for="city">City</label>
             <input type="text" class="form-control" name="city" placeholder="city"
             value="<?= (isset($_POST['city']) && $edtTgl['adrs']) ? $_POST['city'] : $row['city']; ?>" <?= readonly($edtTgl['adrs']) ?> >
             <?= errorIssetCheck('city'); ?>
           </div>
-          <div class="form-group col-md-2">
+          <div class="form-group col-sm-12 col-md-2">
             <label for="province">Province</label>
             <select name="province" class="form-control" <?= readonly($edtTgl['adrs']) ?> >
               <?php
@@ -155,14 +157,14 @@
               }?>
             </select>
           </div> <!-- end of province -->
-          <div class="form-group col-md-2">
+          <div class="form-group col-sm-12 col-md-2">
             <label for="postal">Postal Code</label>
             <input type="text" class="form-control" name="postal" placeholder="postal code"
             value="<?= (isset($_POST['postal']) && $edtTgl['adrs']) ? $_POST['postal'] : $row['postal']; ?>"
             <?= readonly($edtTgl['adrs']) ?> >
             <?= errorIssetCheck('postal'); ?>
           </div> <!-- end of postal -->
-          <div class="form-group col-md-2">
+          <div class="form-group col-sm-12 col-md-2">
             <label for="country">Country</label>
             <select name="country" class="form-control" <?= readonly($edtTgl['adrs']) ?> >
               <?php
@@ -174,20 +176,24 @@
             </select>
           </div> <!-- end of country -->
         </div> <!-- end of city, prov, postal, country row -->
-      <?php endwhile; ?>
+
+        <div class="form-row" data-value="btn2">
+          <div class="form-group col-sm-3">
+            <?= displayEditBtnToggle($edtTgl['adrs'], 'edit_adrs', 'edit address', 'save_adrs', 'save'); ?>
+          </div>
+        </div> <!-- end of btn *** display: none/block toggle based on screen size -->
+      <?php endforeach; ?>
 
         <div class="dropdown-divider"></div>
       
       <?php
-        global $con;
-        moreResCheck($con);
-        $result = $con->query("CALL profile_load_phone($id)") or die($con->error);
         $phonecounter = 1;
-        while($row = $result->fetch_assoc()):
+        $phonecounterA = 1; $phonecounterB = 1; // used for edit btn toggle
+        foreach($loadprofile->phoneArray as $row):
       ?>
         <input type="hidden" name="<?= 'phoneid' . $phonecounter ?>" value="<?= $row['id'] ?>"> <!-- hidden val to get phone id -->
         <div class="form-row">
-          <div class="form-group col-md-3">
+          <div class="form-group col-sm-12 col-md-4 col-lg-4">
             <label for="phone">Phone</label>
             <?php $phoneinput = 'phoneinput' . $phonecounter; ?>
             <input type="text" class="form-control" placeholder="phone number"
@@ -203,12 +209,12 @@
                   echo '<p class="text-danger small">* 10 digits required</p>' . $phonecounter;
             }}?>
           </div> <!-- end of phone field -->
-          <div class="form-group col-md-1">
+          <div class="form-group col-6 col-sm-12 col-md-2">
             <label for="ext">Ext</label>
             <input type="text" class="form-control" placeholder="optional" name="<?= 'ext' . $phonecounter ?>" <?= readonly($edtTgl['phone']); ?>
             value="<?= $row['ext']; ?>">
           </div>
-          <div class="form-group col-md-2">
+          <div class="form-group col-sm-12 col-md-2">
             <label for="phonetype">Type</label>
             <select name="<?= 'phonetype' . $phonecounter ?>" class="form-control" <?= readonly($edtTgl['phone']) ?> >
               <?php
@@ -219,15 +225,25 @@
               }?>
             </select>
           </div> <!-- end of phone option -->
-          <div class="form-group col-md-1 offset-2">
+          <div class="form-group col-lg-2" data-value="btn1">
             <?php
-              if($phonecounter == 1) {
+              if($phonecounterA == 1) {
                 echo displayEditBtnToggle($edtTgl['phone'], 'edit_phone', 'edit phone', 'save_phone', 'save');
-                $phonecounter++;
+                $phonecounterA++;
             }?>
-          </div> <!-- end of btn -->
+          </div> <!-- end of btn *** display: none/block toggle based on screen size -->
         </div> <!-- end of phone form row -->
-      <?php endwhile; ?>
+        
+      <?php endforeach; ?>
+      <div class="form-row">
+        <div class="form-group col-sm-3" data-value="btn2">
+          <?php
+            if($phonecounterB == 1) {
+              echo displayEditBtnToggle($edtTgl['phone'], 'edit_phone', 'edit phone', 'save_phone', 'save');
+              $phonecounterB++;
+          }?>
+        </div> <!-- end of btn *** display: none/block toggle based on screen size -->
+      </div>
       </form> <!-- end of form -->
     </div> <!-- end of card -->
   </div> <!-- end of col -->

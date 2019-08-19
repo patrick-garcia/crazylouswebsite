@@ -1,98 +1,96 @@
-<?= pre_r($reg) ?>
-
-<div class="container container-min-height">
+<div class="container mt-4" id="create-container">
   <div class="col-md-12">
-    <div class="card box-shadow p-4 text-secondary">
+    
+    <div class="card box-shadow text-secondary p-4">
       <div class="row mt-3 mx-4">
         <h3 class="">Registration</h3>
       </div> <!-- end of h2 div -->
       <div class="dropdown-divider mx-4"></div>
       <form action="" method="POST" class="m-4">
         <div class="form-row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-sm-12 col-md-6 col-lg-6">
             <label for="firstname">First Name</label>
-            <input type="text" class="form-control" name="firstname" placeholder="first name" value="<?= inputCreateVal('fname') ?>" >
+            <input type="text" class="form-control" name="firstname" placeholder="first name" value="<?= showInputVal($userInfo->fname) ?>" >
             <?= errorIssetCheck('firstname') ?>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-sm-12 col-md-6 col-lg-6">
             <label for="lastname">Last Name</label>
-            <input type="text" class="form-control" name="lastname" placeholder="last name" value="<?= inputCreateVal('lname') ?>" >
+            <input type="text" class="form-control" name="lastname" placeholder="last name" value="<?= showInputVal($userInfo->lname) ?>" >
             <?= errorIssetCheck('lastname') ?>
           </div>
         </div> <!-- end of name row -->
+
         <div class="form-row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-sm-12 col-md-6 col-lg-6">
             <label for="email">Email</label>
-            <input type="email" class="form-control" name="email" placeholder="email" value="<?= inputCreateVal('email') ?>" >
+            <input type="email" class="form-control" name="email" placeholder="email" value="<?= showInputVal($userInfo->email) ?>" >
             <?= errorIssetCheck('email') ?>
           </div>
         </div> <!-- end of email row -->
+
         <div class="form-row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-sm-12 col-md-6 col-lg-6">
             <label for="pass1">Password</label>
-            <input type="password" class="form-control" name="pass1" placeholder="password" value="<?= inputCreateVal('pword') ?>" >
+            <input type="password" class="form-control" name="pass1" placeholder="password" value="<?= showInputVal($userInfo->password) ?>" >
             <?php
               echo errorIssetCheck('pass1');
-              if (isset($errors['passCheck']) && !isset($errors['pass1']) && !isset($errors['pass2'])) {
+              if(isset($errors['passCheck']) && !isset($errors['pass1']) && !isset($errors['pass2'])) {
                 echo '<p class="text-danger small">' . $errors['passCheck'] . '</p>';
             }?>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-sm-12 col-md-6 col-lg-6">
             <label for="pass1">Confirm Password</label>
-            <input type="password" class="form-control" name="pass2" placeholder="confirm password" value="<?= inputCreateVal('confirmPass') ?>" >
+            <input type="password" class="form-control" name="pass2" placeholder="confirm password" value="<?= showInputVal($userInfo->confirmPass) ?>" >
             <?= errorIssetCheck('pass2') ?>
           </div>
         </div> <!-- end of password row -->
-        
         <div class="dropdown-divider"></div>
         <!-- ********************* -->
         <div class="form-row">
-          <div class="form-group col-md-8">
+          <div class="form-group col-sm-12 col-md-6 col-lg-6">
             <label for="securityquestion">Security Question</label>
             <select class="form-control" name="securityquestion" >
-              <?php foreach($secretquestion as $key => $val) echo '<option value="' . $val . '">' . $key .  '</option>'; ?>
+              <?php foreach($securityquestions as $key => $val) echo '<option value="' . $val . '">' . $key .  '</option>'; ?>
             </select>
           </div>
-        </div> <!-- end of question row -->
-        <div class="form-row">
-          <div class="form-group col-md-8">
+          <div class="form-group col-sm-12 col-md-6 col-lg-6">
             <label for="securityanswer">Answer to Security Question</label>
             <input type="text" class="form-control" name="securityanswer" placeholder="answer to security question"
-              value="">
+              value="<?= showInputVal($security->answer) ?>">
             <?= errorIssetCheck('securityanswer') ?>
           </div>
-        </div><!-- end of answer row -->
-
+        </div> <!-- end of security question row -->
         <div class="dropdown-divider"></div>
+        <!-- ********************* -->
         <div class="form-row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-sm-8 col-md-8 col-lg-6">
             <label for="address">Address</label>
-            <input type="text" class="form-control" name="address" placeholder="address" value="<?= inputCreateVal('adrs') ?>">
+            <input type="text" class="form-control" name="address" placeholder="address" value="<?= showInputVal($addr->adrs) ?>">
             <?= errorIssetCheck('address') ?>
           </div>
-          <div class="form-group col-md-2">
+          <div class="form-group col-sm-4 col-md-4 col-lg-3">
             <label for="suite">Suite</label>
-            <input type="text" class="form-control" name="suite" placeholder="suite" value="<?= inputCreateVal('ste') ?>">
+            <input type="text" class="form-control" name="suite" placeholder="suite" value="<?= showInputVal($addr->ste) ?>">
           </div>
         </div><!-- end of address row -->
         <div class="form-row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-sm-8 col-md-8 col-lg-6">
             <label for="city">City</label>
-            <input type="text" class="form-control" name="city" placeholder="city" value="<?= inputCreateVal('city') ?>">
+            <input type="text" class="form-control" name="city" placeholder="city" value="<?= showInputVal($addr->city) ?>">
             <?= errorIssetCheck('city') ?>
           </div>
-          <div class="form-group col-md-2">
+          <div class="form-group col-sm-4 col-md-4 col-lg-3">
             <label for="province">Province</label>
             <select class="form-control" name="province" >
               <?php foreach($provinces as $key => $val) echo '<option value="' . $val . '">' . $key .  '</option>'; ?>
             </select>
           </div>
-          <div class="form-group col-md-2">
+          <div class="form-group col-sm-4 col-md-4 col-lg-3">
             <label for="postal">Postal</label>
-            <input type="text" class="form-control" name="postal" placeholder="postal code" value="<?= inputCreateVal('post') ?>">
+            <input type="text" class="form-control" name="postal" placeholder="postal code" value="<?= showInputVal($addr->post) ?>">
             <?= errorIssetCheck('postal') ?>
           </div>
-          <div class="form-group col-md-2">
+          <div class="form-group col-sm-4 col-md-4 col-lg-3">
             <label for="country">Country</label>
             <select class="form-control" name="country">
               <?php foreach($countries as $key => $val) echo '<option value="' . $val . '">' . $key . '</option>'; ?>
@@ -101,9 +99,9 @@
         </div> <!-- end of city, prov, post row -->
         <div class="dropdown-divider"></div>
         <div class="form-row">
-          <div class="form-group col-md-3">
+          <div class="form-group col-sm-6 col-md-6 col-lg-6">
             <label for="phone">Phone</label>
-            <input type="text" class="form-control" placeholder="phone number" name="phonenum1" value="<?= inputCreateVal('phone1') ?>">
+            <input type="text" class="form-control" placeholder="phone number" name="phonenum1" value="<?= showInputVal($phone->num1) ?>">
             <?php
               if(isset($errors['phonenum1'])) {
                 echo '<p class="text-danger small">* one contact # required</p>';
@@ -113,11 +111,11 @@
                 }
             }?>
           </div>
-          <div class="form-group col-md-1">
+          <div class="form-group col-sm-6 col-md-3 col-lg-3">
             <label for="ext">Ext</label>
-            <input type="text" class="form-control" placeholder="ext" name="ext1">
+            <input type="text" class="form-control" placeholder="optional" name="ext1">
           </div>
-          <div class="form-group col-md-2">
+          <div class="form-group col-sm-6 col-md-3 col-lg-3">
             <label for="phonetype">Phone Type</label>
             <select class="form-control" name="ptype1">
               <?php foreach($phonetype as $k => $v) echo '<option value="' . $v . '">' . $k . '</option>'; ?>
@@ -126,18 +124,18 @@
         </div> <!-- end of phone1 row -->
 
         <div class="form-row">
-          <div class="form-group col-md-3">
+          <div class="form-group col-sm-6 col-md-6 col-lg-6">
             <label for="phone">Phone (optional)</label>
-            <input type="text" class="form-control" placeholder="phone number (optional)" name="phonenum2" value="<?= inputCreateVal('phone2') ?>">
+            <input type="text" class="form-control" placeholder="phone number (optional)" name="phonenum2" value="<?= showInputVal($phone->num2) ?>">
             <?php if(isset($errors['phonenum2Len']) && !empty($_POST['phonenum2'])) {
               echo '<p class="text-danger small">*  10 digits required</p>';
             }?>
           </div>
-          <div class="form-group col-md-1">
+          <div class="form-group col-sm-6 col-md-3 col-lg-3">
             <label for="ext">Ext</label>
-            <input type="text" class="form-control" placeholder="ext" name="ext2">
+            <input type="text" class="form-control" placeholder="optional" name="ext2">
           </div>
-          <div class="form-group col-md-2">
+          <div class="form-group col-sm-6 col-md-3 col-lg-3">
             <label for="phonetype">Phone Type</label>
             <select class="form-control" name="ptype2">
               <?php foreach($phonetype as $k => $v) echo '<option value="' . $v . '">' . $k . '</option>'; ?>
@@ -145,7 +143,7 @@
           </div>
         </div> <!-- end of phone2 row -->
         <div class="row">
-          <div class="form-group mt-4 offset-8">
+          <div class="form-group m-3">
             <a href="login.php" class="btn btn-outline-primary mr-2">go to login</a>
             <button type="submit" name="register" class="btn btn-success">create user</button>
           </div>

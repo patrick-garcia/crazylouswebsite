@@ -1,5 +1,5 @@
 <?php
-session_start();
+!isset($_SESSION) ? session_start() : NULL;
 include_once '../../data/dbfile.php';
 include_once 'variables.php';
 include_once 'functions.php';

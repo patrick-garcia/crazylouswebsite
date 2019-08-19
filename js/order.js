@@ -70,18 +70,6 @@ function getTotals() {
   document.getElementById('totals').value = arrayTotals;
 }
 
-// load ****
-// window.onload = runCalc;
-
-// window.addEventListener("DOMContentLoaded", function () {
-//   runCalc();
-// }, false);
-
-// window.addEventListener("change", function () {
-//   console.log('it works!!!');
-//   runCalc();
-// }, false);
-
 ["DOMContentLoaded", "change"].forEach(function(evt) {
   window.addEventListener(evt, runCalc, false)
 })

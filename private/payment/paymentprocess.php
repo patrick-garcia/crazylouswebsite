@@ -10,100 +10,56 @@ if(!isset($_SESSION['loggedID'])) {
   ob_end_flush();
   
 } else {
-  isset($_SESSION['payTotals']) ? $payTotals = $_SESSION['payTotals'] : $payTotals = [];
-  isset($_SESSION['orderDetails']) ? $orderDetails = $_SESSION['orderDetails'] : $orderDetails = [];
-  $cc = [];
-  $shipto = [];
+  new ShipAddressClass($_SESSION['loggedID']);
 
-  if(empty($orderDetails) || empty($payTotals)) {
-    $_SESSION['message'] = 'order incomplete, please go back to order section ';
+  if(!isset($_SESSION['orderDetails']) && !isset($_SESSION['payTotals'])) {
+      $_SESSION['message'] = 'order incomplete, please go back to order section ';
+
+  } else {
+    $summary = new OrderSummaryClass($_SESSION['orderDetails'], $_SESSION['payTotals']);
+  }
+} 
+
+if(isset($_POST['confirmOrder'])) {
+  validInput($_POST['cardname'], 'cardname');
+  validInput($_POST['cardnum'], 'cardnum');
+  validInput($_POST['csv'], 'csv');
+
+  validInput($_POST['ship-adrs'], 'ship-adrs');
+  validInput($_POST['ship-city'], 'ship-city');
+  validInput($_POST['ship-post'], 'ship-post');
+
+  if(count($errors) < 1) {
+    $newOrder = new NewOrderClass($_SESSION['loggedID']);
+
+    if($newOrder->orderid > 0) {
+      new NewOrderDetails($_SESSION['orderDetails'], $newOrder->orderid);
+      
+      new NewCreditCardOrder($_SESSION['payTotals'], $_POST['cardname'],
+        $_POST['cardnum'], $_POST['cardtype'],
+        $_POST['cardmonth'], $_POST['cardyear'],
+        $_POST['csv'], $newOrder->orderid );
+      
+      new NewShipToOrder($_POST['ship-adrs'], $_POST['ship-ste'], 
+        $_POST['ship-city'], $_POST['ship-prov'],
+        $_POST['ship-post'], $_POST['ship-ctry'],
+        $newOrder->orderid );
+
+      if(
+        NewOrderDetails::$rowCheck > 0 &&
+        NewCreditCardOrder::$rowCheck > 0 &&
+        NewShipToOrder::$rowCheck > 0
+      ) {
+        $_SESSION['orderLastId'] = $newOrder->orderid;
+        exit(header("location: ordercomplete.php"));
+        ob_end_flush();
+      }
+    }
   }
 }
 
-if(isset($_POST['confirmOrder'])) {
-  $cc['name'] = $_POST['cardname']; validInput($cc['name'], 'cardname');
-  $cc['num'] = $_POST['cardnum']; validInput($cc['num'], 'cardnum');
-  $cc['type'] = $_POST['cardtype'];
-  $cc['month'] = $_POST['cardmonth'];
-  $cc['year'] = $_POST['cardyear'];
-  $cc['csv'] = $_POST['csv']; validInput($cc['csv'], 'csv');
 
-  $shipto['adrs'] = $_POST['ship-adrs']; validInput($shipto['adrs'], 'ship-adrs');
-  $shipto['ste'] = $_POST['ship-ste'];
-  $shipto['city'] = $_POST['ship-city']; validInput($shipto['city'], 'ship-city');
-  $shipto['prov'] = $_POST['ship-prov'];
-  $shipto['post'] = $_POST['ship-post']; validInput($shipto['post'], 'ship-post');
-  $shipto['ctry'] = $_POST['ship-ctry'];
-
-  if(count($errors) < 1) {
-    $custid = $_SESSION['loggedID'];
-    $lastid = $_SESSION['orderLastId'] = orderInsert($custid);
-
-    if($lastid > 0) {
-      foreach($orderDetails as $key => $val) {
-        orderDetailsInsert($lastid, $key);
-      }
-      creditcardInsert($lastid);
-      shipAddressInsert($lastid);
-      
-      exit(header("location: ordercomplete.php"));
-      ob_end_flush();
-    }
-}}
-
-function getLastOrderId($idval) {
-  global $con; $con->next_result();
-  $sql = "CALL order_get_lastid($idval)";
-  $result = $con->query($sql)->fetch_assoc();
-  return $result['lastid'];
-}
-
-function orderInsert($custid) {
-  global $con; $con->next_result();
-  $sql = "CALL order_insert($custid)";
-  return $con->query($sql) ? getLastOrderId($custid) : 0;
-}
-
-function orderDetailsInsert($lastid, $index) {
-  global $orderDetails;
-  $albumid = $orderDetails[$index]['albumid'];
-  $price = $orderDetails[$index]['price'];
-  $qty = $orderDetails[$index]['qty'];
-
-  global $con; $con->next_result();
-  $sql = "CALL orderdetails_insert($lastid, $albumid, $price, $qty)";
-  $con->query($sql);
-}
-
-function creditcardInsert($lastid) {
-  global $cc;
-  $name = $cc['name'];
-  $num = $cc['num'];
-  $type = $cc['type'];
-  $expiry = $cc['month'] . "/" . $cc['year'];
-  $csv = $cc['csv'];
-
-  $payTotals = $_SESSION['payTotals'];
-  $subtotal = $payTotals['sub'];
-  $tax = $payTotals['tax'];
-  $total = $payTotals['total'];
-
-  global $con; $con->next_result();
-  $sql = "CALL ordercc_insert('$name', $num, '$type', '$expiry', $csv, $subtotal, $tax, $total, $lastid)";
-  $con->query($sql);
-}
-
-function shipAddressInsert($lastid) {
-  global $shipto;
-  $adrs = $shipto['adrs']; $ste = $shipto['ste'];
-  $city = $shipto['city']; $prov = $shipto['prov'];
-  $post = $shipto['post']; $ctry = $shipto['ctry'];
-
-  global $con; $con->next_result();
-  $sql = "CALL ordershipto_insert('$adrs', '$ste', '$city', '$prov', '$post', '$ctry', $lastid)";
-  $con->query($sql);
-}
-
+// load functions
 function cardmonthLoad() {
   $months = array('jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec');
   foreach($months as $mon) {
@@ -118,10 +74,9 @@ function cardyearLoad($y = 5) {
     $year++;
 }}
 
-// ****
 $creditcard = [];
 if(empty($creditcard)) {
-  global $con; $con->next_result();
+  global $con; moreResCheck($con);
   $cards_result = $con->query("CALL creditcard_load()");
   while($cards_row = $cards_result->fetch_assoc()) {
     $creditcard[] = $cards_row['name'];
@@ -132,9 +87,5 @@ function cardsOptions() {
   foreach($creditcard as $card) echo '<option value="' . $card . '">' . strtoupper($card) . '</option>';
 }
 
-function payTotalsCheck($val) {
-  global $payTotals;
-  return !empty($payTotals) ? number_format($payTotals[$val], 2) : '0.00';
-}
 
 ?>

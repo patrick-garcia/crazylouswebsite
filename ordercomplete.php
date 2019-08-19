@@ -6,5 +6,4 @@
   include 'public/template/banner.html';
   include 'public/template/nav.html';
   include 'public/customer/ordercomplete.html';
-  include 'public/template/footer.html';
 ?>

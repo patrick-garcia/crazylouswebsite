@@ -4,24 +4,18 @@
 }
 
 #login-container {
-  position: relative;
-}
-
-#login-container > div > div {
-  position: absolute;
-  top: 60%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
 }
 
 #login-container h2 {
   background: linear-gradient(to right top, #3d607d, #3f6687, #406c91, #42739c, #4479a6, #437cac, #427fb2, #4182b8, #3d82bb, #3981bf, #3481c2, #3080c5);
-  color: white;
+  color: #fff;
   font-family: 'Indie Flower', cursive;
   height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 #login-container div.card {
@@ -29,20 +23,50 @@
   background: rgba(255,255,255,.9);
 }
 
-#new-user {
-  display: flex;
-  justify-content: flex-end;
+/* register */
+#create-container {
+  max-width: 1000px;
 }
 
+@media (max-width: 500px) {
+  #create-container .card {
+    padding: 0 !important;
+}}
+
 /* profile */
-.edit-btn {
-  margin: 32px 0 0 12px;
-  min-width: 160px;
+#profile-container {
+  max-width: 1000px;
+}
+
+.profile-edit-btn {
+  min-width: 148px;
+}
+
+[data-value='btn1'] {
+  display: none;
+}
+
+[data-value="btn2"] {
+  display: block;
+}
+
+@media (min-width: 992px) {
+  [data-value='btn1'] {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  [data-value="btn2"] {
+    display: none;
+  }
+
+  #profile-container .card {
+    padding: 24px !important;
+  }
 }
 
 /* albums */
-.table-borderless td,
-.table-borderless th {
+.table-borderless td, .table-borderless th {
   border: 0;
 }
 
@@ -60,15 +84,25 @@
 }
 
 .cart {
-  width: 225px;
+  width: 100%;
   z-index: 3;
   position: fixed;
-  right: 3%;
-  top: 12%;
-  background: rgba(200, 200, 200, .7);
-  border: 1px solid darkgrey !important;
-  text-align: center;
+  top: 0%;
+  background: rgba(61, 96, 125, .95);
+  color: #fff;
 }
+
+@media (min-width: 576px) {
+  .cart {
+    width: 225px;
+    z-index: 3;
+    position: fixed;
+    right: 3%;
+    top: 10%;
+    background: rgba(200, 200, 200, .7);
+    border: 1px solid #888 !important;
+    color: #222;
+}}
 
 #albums-container div.album-card {
   position: relative;
@@ -85,9 +119,18 @@
   min-width: 80px;
 }
 
+@media (min-width: 992px) {
+  #albums-container {
+    max-width: 1000px;
+}}
+
 /* order */
 #order-container thead tr th:first-child {
   padding-left: 28px
+}
+
+#order-container tbody tr select {
+  min-width: 50px;
 }
 
 #summary th {
@@ -98,15 +141,18 @@
   content: '$';
 }
 
-#total-container {
-  padding-left: 50px;
-}
+@media (max-width: 500px) {
+  #order-container {
+    padding: 0 6px;
+  }
 
-#order-btns {
-  padding: 20px 0;
-  display: flex;
-  justify-content: flex-end;
-}
+  #order-container .card {
+    padding: 4px !important;
+  }
+
+  #order-container tbody {
+    font-size: 14px;
+}}
 
 /* payment */
 form[name="payment"] {
@@ -116,7 +162,7 @@ form[name="payment"] {
 
 .payment-order-summary {
   padding-top: 36px;
-  margin: 0 0 50px 0;
+  margin: 0 0 40px 0;
 }
 
 #clear-header {
@@ -135,15 +181,7 @@ form[name="payment"] {
 }
 
 /* order complete */
-#paycomplete-container {
-  position: relative;
-  height: 75vh;
-}
-#paycomplete-container > div > div {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+#paycomplete-container div.row div:first-child {
   text-align: center;
 }
 
@@ -166,10 +204,11 @@ form[name="payment"] {
 
 #paycomplete-container ul {
   display: flex;
-  justify-content: space-around;
-  padding: 0;
-  width: 45%;
-  margin: 0 auto;
+}
+
+#paycomplete-container ul li {
+  width: 50%;
+
 }
 
 .limegreen {
@@ -188,6 +227,31 @@ form[name="payment"] {
 #history-table th:first-child {
   padding-left: 1.5rem; /* 1.5 to match td bootstrap default */
 }
+
+/* discussion */
+@media (min-width: 576px) and (max-width: 991px) {
+  #discussion-container {
+    max-width: 95%;
+}}
+
+#discussion-container  div.comment-post {
+  background-color: #f8f9fa;
+}
+
+@media (max-width: 767px) {
+  #create-btn-div {
+    justify-content: start !important;
+  }
+
+  #new-post-form form {
+    padding: 0;
+}}
+
+/* contact */
+@media (min-width: 500px) {
+  #contact-container div.row div.card {
+    padding: 24px !important;
+}}
 
 /* msg */
 .frown-font-awesome::after {

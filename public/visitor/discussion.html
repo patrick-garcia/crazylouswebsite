@@ -1,0 +1,131 @@
+<?= successMsg() ?>
+
+<div class="container text-secondary container-min-height" id="discussion-container">
+  <div class="col-sm-12">
+  <div class="row sort-filter">
+    <div class="col-md-12">
+      <form action="" method="POST" class="px-2">
+        <div class="card-title mb-4">
+          <h3>Disccussion Board</h3>
+        </div>
+        <div class="row d-flex justify-content-between">
+          <div class="form-group col-sm-6 col-md-6 col-lg-4">
+            <h5 class="pl-2 font-weight-light">subject:</h5>
+            <select name="subjecttitle" class="form-control form-control-lg" onchange="this.form.submit()">
+              <?= $subj->showSortSubj($subj->subjVal)?>
+            </select>
+          </div>
+          <div class="form-group col-sm-6 col-md-3 d-flex align-items-end justify-content-end" id="create-btn-div" >
+            <a class="btn btn-outline-primary mb-1" data-toggle="collapse" href="#new-post-form" role="button">Create New Post</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div> <!-- end of sort filter row -->
+
+  <!-- **** -->
+  <div class="col-md-12 collapse mt-2" id="new-post-form">
+    <div class="card card-body box-shadow">
+      <form action="" method="POST" class="">
+        <div class="card-title mb-4">
+          <h4 class="font-italic ml-2">New Post</h4>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label class="font-italic ml-2" for="titleNewPost">title</label>
+            <input type="text" class="form-control" name="titleNewPost" placeholder="field CANNOT be empty">
+            <p class="text-danger small" id="titleposterror"></p>
+          </div>
+          <div class="form-group col-md-4">
+            <label class="font-italic ml-2" for="subjectNewPost">subject</label>
+            <select class="form-control" name="subjectNewPost">
+              <?= $subj->showNewPostSubj($subj->subjVal) ?>
+            </select>
+          </div>
+        </div> <!-- end of subject row -->
+        <div class="form-row">
+          <div class="form-group col-md-8">
+            <label class="font-italic ml-2" for="textNewPost">message</label>
+            <textarea class="form-control" id="" rows="6" name="textNewPost" placeholder="field CANNOT be empty"></textarea>
+            <p class="text-danger small" id="textposterror"></p>
+          </div>
+        </div> <!-- end of row -->
+        <div class="form-row">
+          <button type="submit" name="btnNewPost" class="btn btn-primary ml-1 mt-2" disabled>submit post</button>
+          <a class="btn btn-outline-secondary ml-4 mt-2" data-toggle="collapse" href="#new-post-form" role="button">close post</a>
+        </div>
+      </form>
+    </div>
+  </div> <!-- end of new post -->
+  
+  <main class="">
+  <?php foreach($posts->rows as $key => $val): ?>
+    <!-- <div class="card card-body box-shadow mt-4"> -->
+    <div class="card box-shadow mt-4">
+      <div class="col-md-10">
+        <div class="card-body">
+          <div class="card-title text-left">
+            <h3 class="font-weight-bold"><?= $val['title'] ?></h3>
+            <h6 class="font-weight-light"><?= date("F j, Y", strtotime($val['tstamp'])) ?>
+              by <span class="font-weight-normal"><?= $posts->displayUsername($val['userid']) ?></span>
+            </h6>
+          </div>
+          <blockquote class="text-justify">
+            <p><?= $val['body'] ?></p>
+          </blockquote>
+        </div>
+      </div> <!-- end of post -->
+
+      <!-- **** -->
+      <!-- reply section is only available to customers that are logged id -->
+      <div class="col-md-8">
+        <form action="" method="post">
+          <div class="card-body">
+            <div class="form-group">
+              <textarea class="form-control" id="" rows="3" name="<?= 'postCommInput' . $val['postid'] ?>"></textarea>
+              <?php
+                $errorCheckInputVal = 'errorCheckInputVal' . $val['postid'];
+                echo isset($errors[$errorCheckInputVal]) ? '<p class="text-danger small">' . $errors[$errorCheckInputVal] . '</p>' : '';
+              ?>
+              <button class="btn btn-outline-secondary btn-sm mr-2 mt-4" type="submit"
+                name="<?= 'postCommBtn' . $val['postid'] ?>">
+                leave a comment
+              </button>
+            </div>
+          </div>
+        </form>
+      </div> <!-- end of reply section -->
+    
+      <section class="pb-4">
+        <?php 
+          $commentsArray = $posts->loadComments($val['postid']);
+          foreach($commentsArray as $key => $val):
+        ?>
+          <div class="row m-2 d-flex justify-content-end">
+            <div class="col-md-10 ">
+              <div class="comment-post card-body">
+                <div class="card-title text-right">
+                  <h6 class="font-weight-light">
+                    <span class="font-weight-normal"><?= $posts->displayUsername($val['userid']) ?></span>
+                    replied on <?= date("F j, Y", strtotime($val['date'])) ?>
+                  </h6>
+                </div>
+                <blockquote class="font-weight-light mt-4">
+                  <p><?= $val['text'] ?></p>
+                </blockquote>
+              </div>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </section> <!-- end of comments -->
+    </div> <!-- end of card -->
+  <?php endforeach; ?>
+  </main> 
+  
+  </div> xxxx
+</div> <!-- end of container -->
+
+<!-- **** -->
+<script type="text/javascript" src="js/discussion.js"></script>
+<!-- <script type="text/javascript" src="js/discussion-resize.js"></script> -->
+

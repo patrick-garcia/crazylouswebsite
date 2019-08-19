@@ -1,26 +1,19 @@
-<div class="container container-min-height">
-  <div class="col-md-6 offset-3 my-4 py-4">
-    <div class="card box-shadow p-4 text-secondary">
-      <div class="card-header box-shadow">
-        <h4 class="pl-3 mb-0">Final Project</h4>
-      </div>
-      <div class="card-body">
-        <ul class="list-group list-group-flush">
-          <?php foreach($course as $key => $val): ?>
-            <li class="list-group-item"><?= $key . ': ' . $val ?></li>
-          <?php endforeach; ?>
-
-          <?php foreach($student as $key => $val): ?>
-            <li class="list-group-item"><?= $key . ': ' . $val ?></li>
-          <?php endforeach; ?>
-
-          <?php foreach($contact as $key => $val): ?>
-            <li class="list-group-item">
-              <?= $key . ': <a href="' . $val['prefix'] . $val['display'] . '"' . openNewTab($key) . '>' . $val['display'] . '</a>' ?>
-            </li>
-          <?php endforeach; ?>
-        </ul>
-      </div> <!-- end of card-body -->
-    </div> <!-- end of card -->
+<div class="container" id="contact-container">
+  <div class="row d-flex justify-content-center">
+    <div class="col-sm-12 col-md-9 col-lg-8 mb-4 pb-4">
+      <div class="card box-shadow text-secondary p-1">
+        <div class="card-header box-shadow">
+          <h4 class="pl-3 mb-0">Final Project</h4>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <?= $course1->string ?>
+            <?= $course2->string ?>
+            <?= $name->string ?>
+            <?= $contact->string ?>
+          </ul>
+        </div> <!-- end of card-body -->
+      </div> <!-- end of card -->
+    </div>
   </div>
 </div>

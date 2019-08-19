@@ -4,9 +4,9 @@
   function urlCheck($url) {
     $array = explode('/', $url);
     $urlPage = $array[(count($array) - 1)];
-    return $urlPage == 'create.php' ? 'box-shadow' : '';
+    return $urlPage == 'create.php' ? ' box-shadow' : '';
 }?>
 
-<div class="header <?= urlCheck($_SERVER['REQUEST_URI']) ?> ">
+<div class="header<?= urlCheck($_SERVER['REQUEST_URI']) ?> d-flex align-items-center justify-content-center">
   <h2><?= $site['name'] ?></h2>
 </div>

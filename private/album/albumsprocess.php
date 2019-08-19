@@ -11,53 +11,36 @@ if(!isset($_SESSION['loggedID'])) {
 
 } else {
   // default settings, 6 equals all category
-  !isset($catval) ? $catval = 6 : $catval;
-  !isset($sortby) ? $sortby = 'album' : $sortby;
+  $category = new CategoryClass();
+  !isset($catval) ? $catval = 6 : '';
+  !isset($sortby) ? $sortby = 'albumname' : '';
   !isset($_SESSION['orderalbumID']) ? $_SESSION['orderalbumID'] = [] : NULL;
 }
 
-if(isset($_POST['sortsubmit'])) {
-  $catval = $_POST['category'];
-  $sortby = $_POST['sortby'];
+if(isset($_POST['category']) || isset($_POST['sortby'])) {
+  $showAlbum = new DisplayAlbumsClass($_POST['category'], $_POST['sortby']);
+  $catval = $showAlbum->catval;
+  $sortby = $showAlbum->sortby;
+  
+} else {
+  $showAlbum = new DisplayAlbumsClass(6, 'albumname');
+  $catval = $showAlbum->catval;
+  $sortby = $showAlbum->sortby;
 }
 
 if(isset($_GET['getalbumID'])) {
-  addAlbumId($_GET['getalbumID']);
+  CartClass::addAlbumId($_GET['getalbumID']);
 }
 
 if(isset($_GET['clearcart'])) {
-  clearCart();
+  CartClass::clearCart();
 }
 
-function albumOrArtist($sortOption) {
-  return $sortOption == 'album' ? "albumname" : "artistgroupname";
-};
-
-// call is catid equals 6
-function showAllCategory($sortOptVal) {
-  $val = albumOrArtist($sortOptVal);
-  return "SELECT * FROM album, artistgroup WHERE album.artistgroupid = artistgroup.artistgroupid ORDER BY " . $val . " ASC";
-
-  // return "CALL album_load_all('" . $val . "')";
-  // $val to sort based on album or artist not working
-}
-
-function showSelectedCat($sortOptVal, $catIdVal) {
-  $val = albumOrArtist($sortOptVal);
-  return 'SELECT * FROM album, albumcreation, category, artistgroup WHERE album.artistgroupid = artistgroup.artistgroupid AND album.albumid = albumcreation.albumid AND albumcreation.categoryid = category.categoryid AND category.categoryid = ' . $catIdVal . ' ORDER BY ' . $val . ' ASC';
-  
-  // return "CALL album_load_by_catid('" . $val . "', " . $catIdVal . ")";
-  // $val to sort based on album or artist not working
-}
-
-function addAlbumId($id) {
-  if(!in_array($id, $_SESSION['orderalbumID'])) {
-    $_SESSION['orderalbumID'][] = $id;
-}}
-
+// load show cart if necessary
 function cartShow() {
   if(!isset($_SESSION['orderalbumID']) || count($_SESSION['orderalbumID']) < 1) {
     return 'style="display: none;"';
 }}
+
 
 ?>

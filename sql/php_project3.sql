@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 25, 2019 at 11:30 PM
+-- Generation Time: Aug 15, 2019 at 08:46 PM
 -- Server version: 5.6.35
 -- PHP Version: 7.1.6
 
@@ -17,37 +17,41 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `CrazyLouGarcia`
+-- Database: `php_project3`
 --
+CREATE DATABASE IF NOT EXISTS `php_project3` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `php_project3`;
 
-DELIMITER
-$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `album_get_artist`
-(IN `artid` INT)
-    READS SQL DATA
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `album_get_artist` (IN `artid` INT)  READS SQL DATA
 SELECT *
 FROM album, artistgroup
 WHERE album.artistgroupid = artistgroup.artistgroupid
   AND album.artistgroupid = artid$$
-DELIMITER ;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `album_load_all`
-(IN `sortval` VARCHAR
-(100))
-    READS SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `album_get_price` (IN `num` INT)  READS SQL DATA
+SELECT album.albumid, album.price as price, album.albumname as album, artistgroup.artistgroupname as artist
+from album, artistgroup
+WHERE album.artistgroupid = artistgroup.artistgroupid
+  AND album.albumid = num$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `album_get_tracks` (IN `id` INT)  READS SQL DATA
+SELECT tracks.trackname
+FROM album, tracks, trackcreation
+WHERE album.tracklistid = trackcreation.tracklistid
+  AND trackcreation.trackid = tracks.trackid
+  AND album.tracklistid = id$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `album_load_all` (IN `sortval` VARCHAR(100))  NO SQL
 SELECT *
 FROM album, artistgroup
 WHERE album.artistgroupid = artistgroup.artistgroupid
 ORDER BY sortval ASC$$
-DELIMITER ;
 
-DELIMITER
-$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `album_load_by_catid`
-(IN `ord` VARCHAR
-(100), IN `catid` INT)
-    NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `album_load_by_catid` (IN `catid` INT(11), IN `ord` VARCHAR(20))  NO SQL
 SELECT *
 FROM album, albumcreation, category, artistgroup
 WHERE album.albumid = albumcreation.albumid
@@ -55,379 +59,232 @@ WHERE album.albumid = albumcreation.albumid
   AND albumcreation.categoryid = category.categoryid
   AND category.categoryid = catid
 ORDER BY ord$$
-DELIMITER ;
 
-DELIMITER
-$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `album_get_price`
-(IN `num` INT)
-    READS SQL DATA
-SELECT album.albumid, album.price as price, album.albumname as album, artistgroup.artistgroupname as artist
-from album, artistgroup
-WHERE album.artistgroupid = artistgroup.artistgroupid
-  AND album.albumid = num$$
-DELIMITER ;
-
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `category_load`
-()
-    NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `category_load` ()  NO SQL
 SELECT *
 FROM category
 ORDER BY sortid ASC$$
-DELIMITER ;
 
-DELIMITER
-$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `album_get_tracks`
-(IN `id` INT)
-    READS SQL DATA
-SELECT tracks.trackname
-FROM album, tracks, trackcreation
-WHERE album.tracklistid = trackcreation.tracklistid
-  AND trackcreation.trackid = tracks.trackid
-  AND album.tracklistid = id$$
-DELIMITER ;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `comment_insert_new` (IN `useridnum` INT(11), IN `textval` VARCHAR(400), IN `postidnum` INT(11))  MODIFIES SQL DATA
+INSERT INTO comments(userid, text, date, time, postid)
+	VALUES(useridnum, textval, CURRENT_DATE, CURRENT_TIME, postidnum)$$
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `countries_load`
-()
-    NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `comment_load_based_on_postid` (IN `postidnum` INT)  NO SQL
+SELECT * FROM comments
+WHERE postid = postidnum
+ORDER BY date DESC, time DESC$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `countries_load` ()  NO SQL
 SELECT *
 FROM country$$
-DELIMITER
-;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `create_get_inserted_id`
-(IN `emailval` VARCHAR
-(50))
-    NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `create_get_inserted_id` (IN `emailval` VARCHAR(50))  NO SQL
 Select Max(id) as lastid, email
 from customer
 where email = emailval$$
-DELIMITER ;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `creditcard_load`
-()
-    NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `creditcard_load` ()  NO SQL
 SELECT *
 FROM creditcard$$
-DELIMITER
-;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `history_load`
-(IN `custid` INT
-(11))
-    NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `discussion_based_on_subj` (IN `subjid` INT(11))  NO SQL
+SELECT * FROM discussion, subject
+	WHERE discussion.subjectid = subject.id
+    AND subject.id = subjid
+    	ORDER BY discussion.postdate ASC$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `discussion_get_username` (IN `idnum` INT(11))  NO SQL
+SELECT * FROM customer WHERE id = idnum$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `discussion_insert_new` (IN `subid` INT(11), IN `titleparam` VARCHAR(55), IN `bodyparam` VARCHAR(400), IN `useridnum` INT(11))  MODIFIES SQL DATA
+INSERT INTO discussion(subjectid, title, body, postdate, posttime, userid)
+	VALUES(subid, titleparam, bodyparam, CURRENT_DATE, CURRENT_TIME, useridnum)$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `discussion_load_all` ()  NO SQL
+SELECT * FROM discussion, subject
+	WHERE discussion.subjectid = subject.id
+    	ORDER BY discussion.postdate ASC$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `discussion_load_based_on_subj` (IN `idnum` INT(11))  NO SQL
+SELECT * FROM discussion, subject
+	WHERE discussion.subjectid = subject.id
+    AND subject.id = idnum
+    	ORDER BY discussion.postdate ASC$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `history_load` (IN `custid` INT(11))  NO SQL
 SELECT DISTINCT orders.id as ordernum, orders.date as date, orderpayment.id as invnum, orderpayment.total as total
 FROM orders, orderpayment
 WHERE orders.id = orderpayment.orderid
   AND orders.customerid = custid$$
-DELIMITER ;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_new_address`
-(IN `str` VARCHAR
-(100), IN `ste` VARCHAR
-(100), IN `cty` VARCHAR
-(100), IN `prov` VARCHAR
-(100), IN `post` VARCHAR
-(100), IN `ctry` VARCHAR
-(100), IN `lastid` INT)
-    MODIFIES SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_new_address` (IN `str` VARCHAR(100), IN `ste` VARCHAR(100), IN `cty` VARCHAR(100), IN `prov` VARCHAR(100), IN `post` VARCHAR(100), IN `ctry` VARCHAR(100), IN `lastid` INT)  MODIFIES SQL DATA
 INSERT INTO address
   (street, suite, city, province, postal, country, customerid, active)
-VALUES(str, ste, cty, prov, post, ctry, lastid, 1)
-$$
-DELIMITER ;
+VALUES(str, ste, cty, prov, post, ctry, lastid, 1)$$
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_new_cust`
-(IN `fname` VARCHAR
-(100), IN `lname` VARCHAR
-(100), IN `email` VARCHAR
-(100), IN `pass` VARCHAR
-(100))
-    MODIFIES SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_new_cust` (IN `fname` VARCHAR(100), IN `lname` VARCHAR(100), IN `email` VARCHAR(100), IN `pass` VARCHAR(100))  MODIFIES SQL DATA
 INSERT INTO customer
   (id, firstname, lastname, email, password, active)
-VALUES(NULL, fname, lname, email, pass, 1)
-$$
-DELIMITER ;
+VALUES(NULL, fname, lname, email, pass, 1)$$
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_new_phone`
-(IN `num` VARCHAR
-(20), IN `extVal` VARCHAR
-(20), IN `typeVal` VARCHAR
-(20), IN `custid` INT)
-    MODIFIES SQL DATA
-INSERT INTO phone
-  (number, ext, type, customerid, active)
-VALUES(num, extVal, typeVal, custid, 1)
-$$
-DELIMITER ;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_new_phone` (IN `num` VARCHAR(20), IN `extVal` VARCHAR(20), IN `typeVal` VARCHAR(20), IN `custid` INT(11))  MODIFIES SQL DATA
+INSERT INTO phone(number, ext, type, customerid, active)
+	VALUES(num, extVal, typeVal, custid, 1)$$
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `login_check`
-(IN `login` VARCHAR
-(100), IN `pword` VARCHAR
-(100))
-    READS SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `login_check` (IN `login` VARCHAR(100), IN `pword` VARCHAR(100))  READS SQL DATA
 SELECT customer.id as loginid
 FROM customer
 WHERE customer.email = login AND customer.password = pword
-  AND customer.active = 1
-$$
-DELIMITER ;
+  AND customer.active = 1$$
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `logout_clear_prev`
-(IN `custid` INT)
-    MODIFIES SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `logout_clear_prev` (IN `custid` INT)  MODIFIES SQL DATA
 UPDATE session SET isloggedin = 0
 WHERE customerid = custid$$
-DELIMITER ;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ordcomplete_get_order_info`
-(IN `idnum` INT
-(11))
-    NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ordcomplete_get_order_info` (IN `idnum` INT(11))  NO SQL
 SELECT *
 FROM orders
 WHERE id = idnum$$
-DELIMITER ;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ordcomplete_get_pay_info`
-(IN `idnum` INT
-(11))
-    NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ordcomplete_get_pay_info` (IN `idnum` INT(11))  NO SQL
 SELECT *
 FROM orderpayment
 WHERE orderid = idnum$$
-DELIMITER ;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `order_get_lastid`
-(IN `custid` INT)
-    NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ordercc_insert` (IN `name` VARCHAR(100), IN `num` INT(11), IN `type` VARCHAR(20), IN `exp` VARCHAR(20), IN `csvnum` INT(11), IN `subt` DECIMAL(10,2), IN `taxnum` DECIMAL(10,2), IN `totalnum` DECIMAL(10,2), IN `orderidnum` INT(11))  MODIFIES SQL DATA
+INSERT INTO orderpayment
+  (ccname, ccnum, cctype, expiry, csv, subtotal, tax, total, orderid)
+VALUES(name, num, type, exp, csvnum, subt, taxnum, totalnum, orderidnum)$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `orderdetails_insert` (IN `orderidnum` INT(11), IN `albumidnum` INT(11), IN `price` DECIMAL(10,2), IN `qtynum` INT(11))  MODIFIES SQL DATA
+INSERT INTO orderdetails
+  (orderid, albumid, albumprice, qty)
+VALUES(orderidnum, albumidnum, price, qtynum)$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ordershipto_insert` (IN `adrs` VARCHAR(100), IN `ste` VARCHAR(10), IN `cty` VARCHAR(25), IN `prov` VARCHAR(25), IN `post` VARCHAR(10), IN `ctry` VARCHAR(25), IN `orderidnum` INT(11))  MODIFIES SQL DATA
+INSERT INTO ordership
+  (address, suite, city, province, postal, country, orderid)
+VALUES(adrs, ste, cty, prov, post, ctry, orderidnum)$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `order_get_lastid` (IN `custid` INT)  NO SQL
 SELECT MAX(id) as lastid, date, customerid
 from orders
 WHERE customerid = custid$$
-DELIMITER ;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `order_insert`
-(IN `custid` INT)
-    MODIFIES SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `order_insert` (IN `custid` INT)  MODIFIES SQL DATA
 INSERT INTO orders
   (date, customerid, active)
-VALUES(CURRENT_DATE, custid, 1)
-$$
-DELIMITER ;
+VALUES(CURRENT_DATE, custid, 1)$$
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ordercc_insert`
-(IN `name` VARCHAR
-(100), IN `num` INT
-(11), IN `type` VARCHAR
-(20), IN `exp` VARCHAR
-(20), IN `csvnum` INT
-(11), IN `subt` DECIMAL
-(10,2), IN `taxnum` DECIMAL
-(10,2), IN `totalnum` DECIMAL
-(10,2), IN `orderidnum` INT
-(11))
-    MODIFIES SQL DATA
-INSERT INTO orderpayment
-  (ccname, ccnum, cctype, expiry, csv, subtotal, tax, total, orderid)
-VALUES(name, num, type, exp, csvnum, subt, taxnum, totalnum, orderidnum)
-$$
-DELIMITER ;
-
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `orderdetails_insert`
-(IN `orderidnum` INT
-(11), IN `albumidnum` INT
-(11), IN `price` DECIMAL
-(10,2), IN `qtynum` INT
-(11))
-    MODIFIES SQL DATA
-INSERT INTO orderdetails
-  (orderid, albumid, albumprice, qty)
-VALUES(orderidnum, albumidnum, price, qtynum)
-$$
-DELIMITER ;
-
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ordershipto_insert`
-(IN `adrs` VARCHAR
-(100), IN `ste` VARCHAR
-(10), IN `cty` VARCHAR
-(25), IN `prov` VARCHAR
-(25), IN `post` VARCHAR
-(10), IN `ctry` VARCHAR
-(25), IN `orderidnum` INT
-(11))
-    MODIFIES SQL DATA
-INSERT INTO ordership
-  (address, suite, city, province, postal, country, orderid)
-VALUES(adrs, ste, cty, prov, post, ctry, orderidnum)
-$$
-DELIMITER ;
-
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `payment_load_address`
-(IN `shipid` INT)
-    NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `payment_load_address` (IN `shipid` INT)  NO SQL
 SELECT *
 FROM address
 WHERE customerid = shipid$$
-DELIMITER ;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `phonetype_load`
-()
-    NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `phonetype_load` ()  NO SQL
 SELECT *
 FROM phonetype
 ORDER BY display ASC$$
-DELIMITER ;
 
-DELIMITER
-$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_load_address`
-(IN `idnum` INT)
-    READS SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_load_address` (IN `idnum` INT)  READS SQL DATA
 SELECT *
 FROM address
 WHERE customerid = idnum$$
-DELIMITER ;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_load_phone`
-(IN `idnum` INT)
-    READS SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_load_phone` (IN `idnum` INT)  READS SQL DATA
 SELECT *
 FROM phone
 WHERE customerid = idnum
-  AND active = 1
-$$
-DELIMITER ;
+  AND active = 1$$
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_load_user`
-(IN `getid` INT)
-    READS SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_load_securityquestion` (IN `custidnum` INT(11))  NO SQL
+SELECT * from userquestions, securityquestions
+WHERE userquestions.questionid = securityquestions.id
+	AND userquestions.custid = custidnum$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_load_user` (IN `getid` INT)  READS SQL DATA
 SELECT *
 FROM customer
 WHERE id = getid$$
-DELIMITER ;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_update_address`
-(IN `idnum` INT, IN `str` VARCHAR
-(40), IN `ste` VARCHAR
-(40), IN `cty` VARCHAR
-(40), IN `post` VARCHAR
-(10), IN `prov` VARCHAR
-(10), IN `ctry` VARCHAR
-(10))
-    MODIFIES SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_update_address` (IN `idnum` INT, IN `str` VARCHAR(40), IN `ste` VARCHAR(40), IN `cty` VARCHAR(40), IN `post` VARCHAR(10), IN `prov` VARCHAR(10), IN `ctry` VARCHAR(10))  MODIFIES SQL DATA
     COMMENT '** make sure is customerid from address not id'
 UPDATE address SET street = str, suite = ste, city = cty, postal = post, province = prov, country = ctry
-WHERE customerid = idnum AND active = 1
-$$
-DELIMITER ;
+WHERE customerid = idnum AND active = 1$$
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_update_name`
-(IN `fname` VARCHAR
-(100), IN `lname` VARCHAR
-(100), IN `eml` VARCHAR
-(100), IN `idnum` INT)
-    MODIFIES SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_update_name` (IN `fname` VARCHAR(100), IN `lname` VARCHAR(100), IN `eml` VARCHAR(100), IN `idnum` INT)  MODIFIES SQL DATA
 UPDATE customer SET firstname = fname, lastname = lname, email = eml
-WHERE id = idnum AND active = 1
-$$
-DELIMITER ;
+WHERE id = idnum AND active = 1$$
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_update_pass`
-(IN `pword` VARCHAR
-(100), IN `idnum` INT)
-    MODIFIES SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_update_pass` (IN `pword` VARCHAR(100), IN `idnum` INT)  MODIFIES SQL DATA
 UPDATE customer SET password = pword
-WHERE id = idnum AND active = 1
-$$
-DELIMITER ;
+WHERE id = idnum AND active = 1$$
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_update_phone`
-(IN `idnum` INT, IN `phonenum` VARCHAR
-(20), IN `extnum` VARCHAR
-(10), IN `ptype` VARCHAR
-(2))
-    MODIFIES SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_update_phone` (IN `idnum` INT, IN `phonenum` VARCHAR(20), IN `extnum` VARCHAR(10), IN `ptype` VARCHAR(2))  MODIFIES SQL DATA
     COMMENT 'id instead of customerid to because of 2 phnums'
 UPDATE phone SET number = phonenum, ext = extnum, type = ptype
 WHERE id = idnum$$
-DELIMITER ;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `provinces_load`
-()
-    NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `profile_update_question` (IN `questionval` INT(11), IN `answerval` VARCHAR(155), IN `userid` INT(11))  MODIFIES SQL DATA
+UPDATE userquestions
+SET questionid = questionval, answer = answerval
+WHERE custid = userid$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `provinces_load` ()  NO SQL
 SELECT *
 FROM province$$
-DELIMITER
-;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `session_check`
-(IN `id` INT, IN `sessval` VARCHAR
-(100))
-    NO SQL
+CREATE DEFINER=`root`@`localhost` PROCEDURE `reset_check_email` (IN `useremail` VARCHAR(155))  NO SQL
+SELECT * from customer
+WHERE email = useremail$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `reset_get_userquestion` (IN `custidnum` INT(11))  NO SQL
+SELECT * FROM userquestions
+WHERE custid = custidnum$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `reset_show_question` (IN `questionid` INT(2))  NO SQL
+SELECT * FROM securityquestions
+WHERE id = questionid$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `reset_update_pass` (IN `idnum` INT(11), IN `newpass` VARCHAR(155))  MODIFIES SQL DATA
+UPDATE customer SET password = newpass WHERE id = idnum$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `securityquestions_load` ()  NO SQL
+SELECT * from securityquestions$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `session_check` (IN `id` INT, IN `sessval` VARCHAR(100))  NO SQL
 SELECT *
 FROM session
 WHERE customerid = id AND sessionval = sessval$$
-DELIMITER ;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `session_insert`
-(IN `id` INT, IN `sessval` VARCHAR
-(100))
-    MODIFIES SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `session_insert` (IN `id` INT, IN `sessval` VARCHAR(100))  MODIFIES SQL DATA
 INSERT INTO session
   (customerid, sessionval, logindate, logintime, isloggedin)
-VALUES(id, sessval, CURRENT_DATE, CURRENT_TIME, 1)
-$$
-DELIMITER ;
+VALUES(id, sessval, CURRENT_DATE, CURRENT_TIME, 1)$$
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `session_update_logout_date`
-(IN `idnumber` INT)
-    MODIFIES SQL DATA
+CREATE DEFINER=`root`@`localhost` PROCEDURE `session_update_logout_date` (IN `idnumber` INT)  MODIFIES SQL DATA
 UPDATE session SET logoutdate = CURRENT_DATE, logouttime = CURRENT_TIME, isloggedin = 0
 WHERE id = idnumber$$
-DELIMITER ;
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `test_albums_load`
-()
-    NO SQL
-SELECT album.albumid, album.albumname, artistgroup.artistgroupid, artistgroup.artistgroupname, album.tracklistid
-FROM album, artistgroup
-WHERE album.artistgroupid = artistgroup.artistgroupid
-ORDER BY album.albumname
-ASC$$
-DELIMITER ;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `subject_insert_new` (IN `subj` VARCHAR(55))  MODIFIES SQL DATA
+    COMMENT 'create new subject option'
+INSERT INTO subject(subjectname, datecreated)
+	VALUES(subj, CURRENT_DATE)$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `subject_load_all` ()  NO SQL
+    COMMENT 'see all from table'
+SELECT * FROM subject
+ORDER BY sortval ASC$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `test_procedure` ()  NO SQL
+SELECT discussion.id, discussion.title, subject.subjectname FROM discussion, subject
+	WHERE discussion.subjectid = subject.id$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `userquestion_insert` (IN `custidnum` INT(11), IN `questionidnum` INT(11), IN `ans` VARCHAR(155))  MODIFIES SQL DATA
+INSERT INTO userquestions(custid, questionid, answer)
+	VALUES(custidnum, questionidnum, ans)$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -454,7 +311,7 @@ CREATE TABLE `address` (
 INSERT INTO `address` (`id`, `street`, `suite`, `city`, `province`, `postal`, `country`, `customerid`, `active`) VALUES
 (1, '1369 Bloor St W', '408', 'Toronto', 'ON', 'M6P4J4', 'CA', 1, 1),
 (2, '111 Modern St', '', 'Toronto', 'ON', 'M6P3H3', 'CA', 2, 1),
-(3, '1122 Yonge St', '22', 'Toronto', 'ON', 'M6K 3J4', 'CA', 5, 1),
+(3, '2222 Yonge St', '201', 'Toronto', '', 'M6K 3J4', 'CA', 5, 1),
 (4, '1200 Lakeshore', '1212', 'North York', 'ON', 'M7M 3J4', 'US', 3, 1),
 (5, '333 King St East', '333', 'Toronto', 'ON', 'M6H 4T5', 'CA', 4, 1),
 (6, '444 Lansdowne Ave', '404', 'Hamilton', 'CA', 'L4H 6K5', 'CA', 6, 1),
@@ -465,7 +322,9 @@ INSERT INTO `address` (`id`, `street`, `suite`, `city`, `province`, `postal`, `c
 (26, '888 Macbook Ave', '', 'Ajax', 'ON', 'M2N 5H3', 'CA', 44, 1),
 (27, '888 Macbook Ave', '', 'Ajax', 'ON', 'M2N 5H3', 'CA', 45, 1),
 (28, '888 Macbook Ave', '', 'Ajax', 'ON', 'M2N 5H3', 'CA', 46, 1),
-(29, '888 Macbook Ave', '', 'Ajax', 'AB', 'M2N 5H3', 'CA', 47, 1);
+(29, '888 Macbook Ave', '', 'Ajax', 'AB', 'M2N 5H3', 'CA', 47, 1),
+(32, '555 Main St', '', 'Ajax', 'AB', 'M1M 4M4', 'CA', 50, 1),
+(41, '777 Emerson St', '', 'Milton', 'ON', 'G5G J7J', 'CA', 63, 1);
 
 -- --------------------------------------------------------
 
@@ -588,6 +447,47 @@ INSERT INTO `category` (`categoryid`, `categoryname`, `sortid`, `active`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `comments`
+--
+
+CREATE TABLE `comments` (
+  `id` int(11) NOT NULL,
+  `userid` int(11) NOT NULL,
+  `text` varchar(400) NOT NULL,
+  `date` date NOT NULL,
+  `time` datetime NOT NULL,
+  `status` int(2) NOT NULL DEFAULT '1',
+  `postid` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `comments`
+--
+
+INSERT INTO `comments` (`id`, `userid`, `text`, `date`, `time`, `status`, `postid`) VALUES
+(1, 2, 'test comment, reply to postid 1', '2019-08-06', '2019-08-06 15:24:42', 1, 1),
+(2, 2, 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto eaque ad fugit totam rerum officia vitae, eligendi culpa?  test comment, reply to postid 2', '2019-08-06', '2019-08-06 15:25:58', 1, 2),
+(3, 2, 'test comment, reply to postid 3', '2019-08-06', '2019-08-06 15:26:33', 1, 3),
+(4, 5, 'test comment, reply to postid 4', '2019-08-06', '2019-08-06 15:26:53', 1, 4),
+(5, 5, 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto eaque ad fugit totam rerum officia vitae, eligendi culpa?  test comment, reply to postid 5', '2019-08-06', '2019-08-06 15:27:26', 1, 5),
+(6, 5, 'test comment, reply to postid 6', '2019-08-06', '2019-08-06 15:27:26', 1, 6),
+(7, 5, 'second comment test for postid 1', '2019-08-06', '2019-08-06 16:15:02', 1, 1),
+(8, 5, 'second comment test for postid 2', '2019-08-06', '2019-08-06 16:15:33', 1, 2),
+(9, 3, 'The iPad comes out on my actual birthday. It’s like Steve Jobs and God got together to say, \"We love you, Phil\".', '2019-08-07', '2019-08-07 14:58:32', 1, 6),
+(10, 3, 'Success is 1% inspiration, 98% perspiration, and 2% attention to detail.', '2019-08-07', '2019-08-07 15:00:20', 1, 6),
+(11, 3, 'I’m the cool dad, that’s my thang. I’m hip, I surf the web, I text. LOL: laugh out loud. OMG: oh my God. WTF: why the face.', '2019-08-07', '2019-08-07 15:03:27', 1, 7),
+(16, 2, 'leaving comment for postid #2... hope this works!!! :(', '2019-08-07', '2019-08-07 16:49:03', 1, 2),
+(34, 3, 'new test for basketball subject (postid 1), userid #3, phil', '2019-08-07', '2019-08-07 18:02:56', 1, 1),
+(35, 3, 'commenting on bluejays post', '2019-08-07', '2019-08-07 18:06:48', 1, 6),
+(36, 3, 'commenting on blog #2', '2019-08-07', '2019-08-07 18:07:14', 1, 8),
+(37, 3, 'commenting on blog #1', '2019-08-07', '2019-08-07 18:07:27', 1, 7),
+(38, 3, 'hello how are you????', '2019-08-07', '2019-08-07 18:14:19', 1, 9),
+(39, 3, 'test:  comment on football post', '2019-08-07', '2019-08-07 18:19:49', 1, 3),
+(42, 5, 'test comment on postid # 18', '2019-08-12', '2019-08-12 10:53:15', 1, 18);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `country`
 --
 
@@ -649,12 +549,48 @@ INSERT INTO `customer` (`id`, `firstname`, `lastname`, `email`, `password`, `act
 (1, 'Patrick', 'Garcia', 'patrick@garcia.com', 'password', 1),
 (2, 'Claire', 'Dunphy', 'claire@dunphy.com', 'e65e0707774c11ff1ca15f6e27b67769', 1),
 (3, 'Phil', 'Dunphy333', 'phil@dunphy.com', '112233', 1),
-(5, 'Alex', 'Dunphy', 'alex@dunphy.com', '888888', 1),
+(5, 'Alex', 'Dunphy', 'alex@dunphy.com', 'e65e0707774c11ff1ca15f6e27b67769', 1),
 (6, 'Haley', 'Dunphy', 'haley@dunphy.com', 'duckfeet', 1),
 (37, 'Manny', 'Delgado', 'manny@delgado.com', 'password8800', 1),
 (38, 'Mitchell', 'Pritchett', 'mitchell@pritchett.com', 'password9900', 1),
 (42, 'Cameron', 'Tucker', 'cameron@tucker.com', 'tucker4444', 1),
-(47, 'Gloria', 'Delgado-Pritchett', 'gloria@pritchett.com', 'ec92d00d7c130df82512548cbc2b4701', 1);
+(47, 'Gloria', 'Delgado-Pritchett', 'gloria@pritchett.com', 'ec92d00d7c130df82512548cbc2b4701', 1),
+(50, 'Jay', 'Pritchett', 'jay@pritchett.com', '5f4dcc3b5aa765d61d8327deb882cf99', 1),
+(63, 'Gil', 'Thorpe', 'gil@thorpe.com', '4edfc924721abb774d5447bade86ea5d', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `discussion`
+--
+
+CREATE TABLE `discussion` (
+  `postid` int(11) NOT NULL,
+  `subjectid` int(11) NOT NULL,
+  `title` varchar(55) NOT NULL,
+  `body` text NOT NULL,
+  `postdate` date NOT NULL,
+  `posttime` time NOT NULL,
+  `tstamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `userid` int(11) NOT NULL,
+  `status` int(2) NOT NULL DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `discussion`
+--
+
+INSERT INTO `discussion` (`postid`, `subjectid`, `title`, `body`, `postdate`, `posttime`, `tstamp`, `userid`, `status`) VALUES
+(1, 1, 'basketball', 'hello how are you today????', '2019-07-30', '12:30:25', '2019-07-30 22:23:37', 2, 1),
+(2, 2, 'baseball', 'hello how are you this morning?', '2019-07-30', '12:41:21', '2019-07-30 22:23:37', 2, 1),
+(3, 2, 'football', 'are you ready for some football?', '2019-07-30', '13:19:54', '2019-07-30 22:23:37', 2, 1),
+(5, 1, 'raptors', 'congrats to the toronto raptors', '2019-07-30', '13:26:13', '2019-07-30 22:23:37', 2, 1),
+(6, 1, 'bluejays', 'blue jays not very good this year :(', '2019-07-30', '18:27:40', '2019-07-30 22:27:40', 2, 1),
+(7, 1, 'blog #1', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto eaque ad fugit totam rerum officia vitae, eligendi culpa? Totam facilis eligendi ad quisquam ea quos sequi architecto sed, animi accusamus!', '2019-08-03', '14:44:37', '2019-08-03 18:44:37', 5, 1),
+(8, 2, 'blog #2', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto eaque ad fugit totam rerum officia vitae, eligendi culpa? Totam facilis eligendi ad quisquam ea quos sequi architecto sed, animi accusamus!', '2019-08-03', '14:45:00', '2019-08-03 18:45:00', 5, 1),
+(9, 3, 'blog #3', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto eaque ad fugit totam rerum officia vitae, eligendi culpa? Totam facilis eligendi ad quisquam ea quos sequi architecto sed, animi accusamus!', '2019-08-03', '14:45:13', '2019-08-03 18:45:13', 5, 1),
+(18, 1, 'Calvin Harris', 'EDM is pretty cool but it gets a little repetitive :(', '2019-08-08', '17:07:03', '2019-08-08 21:07:03', 5, 1),
+(26, 2, 'alex dunphy', 'test new post #887', '2019-08-12', '10:21:04', '2019-08-12 14:21:04', 5, 1);
 
 -- --------------------------------------------------------
 
@@ -716,7 +652,19 @@ INSERT INTO `orderdetails` (`id`, `orderid`, `albumid`, `albumprice`, `qty`, `ac
 (45, 5011, 9, '19.99', 1, 1),
 (46, 5012, 12, '19.99', 1, 1),
 (47, 5013, 2, '19.99', 1, 1),
-(48, 5014, 9, '19.99', 2, 1);
+(48, 5014, 9, '19.99', 2, 1),
+(49, 5015, 9, '19.99', 6, 1),
+(50, 5016, 9, '19.99', 1, 1),
+(51, 5017, 3, '21.99', 2, 1),
+(52, 5018, 2, '19.99', 1, 1),
+(53, 5019, 1, '19.99', 2, 1),
+(54, 5021, 1, '19.99', 1, 1),
+(55, 5022, 12, '19.99', 1, 1),
+(62, 5029, 3, '21.99', 1, 1),
+(63, 5029, 12, '19.99', 1, 1),
+(64, 5030, 4, '21.99', 1, 1),
+(66, 5032, 1, '19.99', 1, 1),
+(67, 5032, 3, '21.99', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -760,7 +708,16 @@ INSERT INTO `orderpayment` (`id`, `ccname`, `ccnum`, `cctype`, `expiry`, `csv`, 
 (1014, 'claire dunphy', 33224455, 'visa', 'jan/2022', 3344, '39.98', '5.20', '45.18', 5011, 1),
 (1015, 'claire dunphy', 111225566, 'visa', 'jan/2022', 444, '19.99', '2.60', '22.59', 5012, 1),
 (1016, 'claire dunphy', 2147483647, 'visa', 'jan/2023', 444, '19.99', '2.60', '22.59', 5013, 1),
-(1017, 'gloria pritchett', 77663377, 'visa', 'jan/2023', 7733, '39.98', '5.20', '45.18', 5014, 1);
+(1017, 'gloria pritchett', 77663377, 'visa', 'jan/2023', 7733, '39.98', '5.20', '45.18', 5014, 1),
+(1018, 'claire dunphy', 33228811, 'visa', 'jan/2022', 3322, '119.94', '15.59', '135.53', 5015, 1),
+(1019, 'claire dunphy', 33445566, 'visa', 'jan/2021', 222, '19.99', '2.60', '22.59', 5016, 1),
+(1020, 'alex dunphy', 2147483647, 'visa', 'mar/2020', 333, '43.98', '5.72', '49.70', 5017, 1),
+(1021, 'alex dunphy', 2147483647, 'visa', 'may/2021', 777, '39.98', '5.20', '45.18', 5019, 1),
+(1022, 'alex dunphy', 2147483647, 'visa', 'apr/2020', 444, '19.99', '2.60', '22.59', 5021, 1),
+(1023, 'alex dunphy', 2147483647, 'visa', 'jan/2021', 555, '19.99', '2.60', '22.59', 5022, 1),
+(1026, 'alex dunphy', 2147483647, 'visa', 'jan/2022', 444, '41.98', '5.46', '47.44', 5029, 1),
+(1027, 'alex dunphy', 2147483647, 'visa', 'jan/2023', 377, '21.99', '2.86', '24.85', 5030, 1),
+(1029, 'alex dunphy', 2147483647, 'visa', 'jan/2021', 333, '41.98', '5.46', '47.44', 5032, 1);
 
 -- --------------------------------------------------------
 
@@ -771,6 +728,7 @@ INSERT INTO `orderpayment` (`id`, `ccname`, `ccnum`, `cctype`, `expiry`, `csv`, 
 CREATE TABLE `orders` (
   `id` int(11) NOT NULL,
   `date` date NOT NULL,
+  `tstamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `customerid` int(11) NOT NULL,
   `active` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -779,35 +737,46 @@ CREATE TABLE `orders` (
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `date`, `customerid`, `active`) VALUES
-(1, '2019-06-02', 38, 1),
-(2, '2019-06-03', 38, 1),
-(3, '2019-06-03', 3, 1),
-(4, '2019-06-03', 37, 1),
-(5, '2019-06-03', 37, 1),
-(6, '2019-06-03', 37, 1),
-(7, '2019-06-03', 37, 1),
-(8, '2019-06-03', 37, 1),
-(9, '2019-06-03', 37, 1),
-(19, '2019-06-04', 37, 1),
-(26, '2019-06-10', 2, 1),
-(27, '2019-06-10', 2, 1),
-(30, '2019-06-13', 2, 1),
-(34, '2019-06-16', 2, 1),
-(35, '2019-06-16', 2, 1),
-(36, '2019-06-16', 2, 1),
-(5001, '2019-06-18', 2, 1),
-(5002, '2019-06-18', 2, 1),
-(5003, '2019-06-18', 2, 1),
-(5005, '2019-06-18', 2, 1),
-(5006, '2019-06-18', 2, 1),
-(5007, '2019-06-18', 2, 1),
-(5009, '2019-06-19', 2, 1),
-(5010, '2019-06-20', 2, 1),
-(5011, '2019-06-21', 2, 1),
-(5012, '2019-06-22', 2, 1),
-(5013, '2019-06-24', 2, 1),
-(5014, '2019-06-25', 47, 1);
+INSERT INTO `orders` (`id`, `date`, `tstamp`, `customerid`, `active`) VALUES
+(1, '2019-06-02', '2019-08-14 23:03:28', 38, 1),
+(2, '2019-06-03', '2019-08-14 23:03:28', 38, 1),
+(3, '2019-06-03', '2019-08-14 23:03:28', 3, 1),
+(4, '2019-06-03', '2019-08-14 23:03:28', 37, 1),
+(5, '2019-06-03', '2019-08-14 23:03:28', 37, 1),
+(6, '2019-06-03', '2019-08-14 23:03:28', 37, 1),
+(7, '2019-06-03', '2019-08-14 23:03:28', 37, 1),
+(8, '2019-06-03', '2019-08-14 23:03:28', 37, 1),
+(9, '2019-06-03', '2019-08-14 23:03:28', 37, 1),
+(19, '2019-06-04', '2019-08-14 23:03:28', 37, 1),
+(26, '2019-06-10', '2019-08-14 23:03:28', 2, 1),
+(27, '2019-06-10', '2019-08-14 23:03:28', 2, 1),
+(30, '2019-06-13', '2019-08-14 23:03:28', 2, 1),
+(34, '2019-06-16', '2019-08-14 23:03:28', 2, 1),
+(35, '2019-06-16', '2019-08-14 23:03:28', 2, 1),
+(36, '2019-06-16', '2019-08-14 23:03:28', 2, 1),
+(5001, '2019-06-18', '2019-08-14 23:03:28', 2, 1),
+(5002, '2019-06-18', '2019-08-14 23:03:28', 2, 1),
+(5003, '2019-06-18', '2019-08-14 23:03:28', 2, 1),
+(5005, '2019-06-18', '2019-08-14 23:03:28', 2, 1),
+(5006, '2019-06-18', '2019-08-14 23:03:28', 2, 1),
+(5007, '2019-06-18', '2019-08-14 23:03:28', 2, 1),
+(5009, '2019-06-19', '2019-08-14 23:03:28', 2, 1),
+(5010, '2019-06-20', '2019-08-14 23:03:28', 2, 1),
+(5011, '2019-06-21', '2019-08-14 23:03:28', 2, 1),
+(5012, '2019-06-22', '2019-08-14 23:03:28', 2, 1),
+(5013, '2019-06-24', '2019-08-14 23:03:28', 2, 1),
+(5014, '2019-06-25', '2019-08-14 23:03:28', 47, 1),
+(5015, '2019-07-08', '2019-08-14 23:03:28', 2, 1),
+(5016, '2019-07-29', '2019-08-14 23:03:28', 2, 1),
+(5017, '2019-08-08', '2019-08-14 23:03:28', 5, 1),
+(5018, '2019-08-08', '2019-08-14 23:03:28', 5, 1),
+(5019, '2019-08-08', '2019-08-14 23:03:28', 5, 1),
+(5020, '2019-08-10', '2019-08-14 23:03:28', 5, 1),
+(5021, '2019-08-10', '2019-08-14 23:03:28', 5, 1),
+(5022, '2019-08-10', '2019-08-14 23:03:28', 5, 1),
+(5029, '2019-08-14', '2019-08-14 23:03:28', 5, 1),
+(5030, '2019-08-14', '2019-08-14 23:03:28', 5, 1),
+(5032, '2019-08-14', '2019-08-14 23:07:22', 5, 1);
 
 -- --------------------------------------------------------
 
@@ -849,7 +818,16 @@ INSERT INTO `ordership` (`id`, `address`, `suite`, `city`, `province`, `postal`,
 (19, '111 Modern St', '', 'Toronto', 'ON', 'M6P3H3', 'CA', 5011, 1),
 (20, '111 Modern St', '', 'Toronto', 'ON', 'M6P3H3', 'CA', 5012, 1),
 (21, '111 Modern St', '', 'Toronto', 'ON', 'M6P3H3', 'CA', 5013, 1),
-(22, '888 Macbook Ave', '', 'Ajax', 'AB', 'M2N 5H3', 'CA', 5014, 1);
+(22, '888 Macbook Ave', '', 'Ajax', 'AB', 'M2N 5H3', 'CA', 5014, 1),
+(23, '111 Modern St', '', 'Toronto', 'ON', 'M6P3H3', 'CA', 5015, 1),
+(24, '111 Modern St', '', 'Toronto', 'ON', 'M6P3H3', 'CA', 5016, 1),
+(25, '1122 Yonge St', '22', 'Toronto', 'ON', 'M6K 3J4', 'CA', 5017, 1),
+(27, '1122 Yonge St', '22', 'Toronto', 'ON', 'M6K 3J4', 'CA', 5019, 1),
+(28, '2222 Yonge St', '20', 'Toronto', 'AB', 'M6K 3J4', 'CA', 5021, 1),
+(29, '2222 Yonge St', '20', 'Toronto', 'AB', 'M6K 3J4', 'CA', 5022, 1),
+(33, '2222 Yonge St', '201', 'Toronto', 'AB', 'M6K 3J4', 'CA', 5029, 1),
+(34, '2222 Yonge St', '201', 'Toronto', 'AB', 'M6K 3J4', 'CA', 5030, 1),
+(36, '2222 Yonge St', '201', 'Toronto', 'AB', 'M6K 3J4', 'CA', 5032, 1);
 
 -- --------------------------------------------------------
 
@@ -889,7 +867,12 @@ INSERT INTO `phone` (`id`, `number`, `ext`, `type`, `customerid`, `active`) VALU
 (50, '4168880088', '', 'C', 46, 1),
 (51, '4167770077', '', 'H', 46, 1),
 (52, '4168880088', '', 'C', 47, 1),
-(53, '4167770077', '', 'H', 47, 1);
+(53, '4167770077', '', 'H', 47, 1),
+(56, '9053333300', '', 'C', 50, 1),
+(59, '4167778888', '14', 'W', 5, 1),
+(60, '4167778877', '', 'C', 5, 1),
+(70, '6479990000', '', 'H', 63, 1),
+(71, '6479990011', '', 'C', 63, 1);
 
 -- --------------------------------------------------------
 
@@ -943,6 +926,28 @@ INSERT INTO `province` (`provinceid`, `display`, `shortval`, `active`) VALUES
 (11, 'Quebec', 'QC', 1),
 (12, 'Sasketchewan', 'SK', 1),
 (13, 'Yukon', 'YT', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `securityquestions`
+--
+
+CREATE TABLE `securityquestions` (
+  `id` int(11) NOT NULL,
+  `question` varchar(155) NOT NULL,
+  `status` int(2) NOT NULL DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `securityquestions`
+--
+
+INSERT INTO `securityquestions` (`id`, `question`, `status`) VALUES
+(1, 'what is your favourite colour?', 1),
+(2, 'what is the name of your first pet?', 1),
+(3, 'what was the name of your high school?', 1),
+(4, 'where is your favourite vacation spot?', 1);
 
 -- --------------------------------------------------------
 
@@ -1022,7 +1027,93 @@ INSERT INTO `session` (`id`, `customerid`, `sessionval`, `logindate`, `logintime
 (196, 2, 'f6231aa410259c23dd270177213ab147', '2019-06-25', '16:39:56', '0000-00-00', '00:00:00', 0),
 (197, 2, 'ee8954e2d4b8d4619a3274378bf940df', '2019-06-25', '16:41:24', '0000-00-00', '00:00:00', 0),
 (198, 2, '8160a4ea0223f5859ee51c7cb1c10cf8', '2019-06-25', '16:43:17', '2019-06-25', '16:45:13', 0),
-(199, 47, '51f2ba27bc2aa41810afe4eef9d81eb7', '2019-06-25', '16:51:35', '2019-06-25', '17:28:01', 0);
+(199, 47, '51f2ba27bc2aa41810afe4eef9d81eb7', '2019-06-25', '16:51:35', '2019-06-25', '17:28:01', 0),
+(200, 2, 'c54ab482145b0a553a2039c58ac06af8', '2019-06-26', '14:44:15', '2019-06-26', '14:44:50', 0),
+(201, 2, 'c9ecedc7e6e87d3fb4547d86f00a16a5', '2019-06-26', '17:50:12', '2019-06-27', '15:30:38', 0),
+(202, 2, '67078fc08b46e6571468730b28d8e7a4', '2019-06-28', '13:57:50', '2019-06-28', '15:04:43', 0),
+(203, 2, '44a4b328c2ca37623fed88c8dc461dfa', '2019-06-28', '15:31:11', '2019-07-04', '16:29:23', 0),
+(204, 2, '2bec103f872bac32b3ec91495572e3d6', '2019-07-04', '17:07:49', '2019-07-04', '17:07:53', 0),
+(205, 2, '750724891ac223d8931ee2399ef1b2f5', '2019-07-04', '18:18:16', '2019-07-04', '19:38:31', 0),
+(206, 2, '229092424f1a999fc95e1af5a24ed63f', '2019-07-04', '19:51:43', '2019-07-04', '20:07:15', 0),
+(207, 2, 'b3c172456ab1ed4842d8bdbe6db9a09e', '2019-07-08', '16:08:18', '2019-07-08', '16:20:54', 0),
+(208, 2, '2eec2d82e9ac5f67e58bf4a9cb5cb2b4', '2019-07-08', '16:21:01', '2019-07-08', '16:22:38', 0),
+(209, 2, 'ae9a18cce6cbbcfc603bfbea39a3f7c3', '2019-07-08', '16:22:50', '2019-07-08', '17:46:05', 0),
+(210, 2, '5aca7fc0f400353b0b7e962c59e8b895', '2019-07-08', '17:46:11', '2019-07-08', '18:26:50', 0),
+(211, 2, '07b7c68dbce44bc05ecc0235d93f7b38', '2019-07-28', '14:03:09', '2019-07-28', '14:27:57', 0),
+(212, 2, '2766b0d389a8bb77954ee64c8f403e04', '2019-07-28', '14:38:29', '2019-07-28', '14:38:33', 0),
+(213, 2, '6a98d31a03d39b85941f4c1da6512354', '2019-07-28', '14:47:18', '2019-07-28', '14:47:20', 0),
+(214, 2, '9076c14a1198e5ae9b8a9b1530f3ce2a', '2019-07-28', '15:00:18', '2019-07-28', '15:00:20', 0),
+(215, 2, 'ae8521e428da124b0af19fe9370d2dff', '2019-07-28', '15:34:23', '2019-07-28', '15:34:24', 0),
+(216, 2, '2ca660e98fccb22c535e864082bc7a46', '2019-07-28', '15:36:42', '2019-07-28', '15:36:43', 0),
+(217, 2, 'a06a65aee9fa90716e0664fc56fa0bed', '2019-07-28', '15:40:26', '2019-07-28', '15:40:27', 0),
+(218, 2, '058f95bef1504bf598c98776c20c9364', '2019-07-28', '15:40:46', '2019-07-28', '15:40:47', 0),
+(219, 2, 'f386ab5ad920246cac7ebb2eb21170d3', '2019-07-28', '15:48:41', '2019-07-28', '15:48:58', 0),
+(220, 2, 'd4cae9a6ca77d557a4d0d43fd1de1a6c', '2019-07-28', '16:11:08', '2019-07-28', '16:12:30', 0),
+(221, 2, '2d2f48ed4417f7a3dcd50ec196b7f021', '2019-07-29', '16:22:33', '2019-07-29', '16:27:06', 0),
+(223, 2, '41aa5e0098ff478402c3a89d8a76f95f', '2019-07-29', '18:24:17', '2019-07-29', '18:24:19', 0),
+(224, 2, 'd20a5a1c22200865f397c1ef3d35c297', '2019-07-29', '18:27:30', '2019-07-29', '18:27:32', 0),
+(225, 2, '650de83540862a1313049e701a958035', '2019-07-29', '18:27:59', '2019-07-29', '18:28:01', 0),
+(226, 2, '1d275b22128d71fdb74dfcc0b27e6bef', '2019-07-30', '13:31:48', '2019-07-30', '13:40:07', 0),
+(227, 2, '94e784100ce1114be9c324530bbb9e0a', '2019-07-30', '15:10:21', '2019-07-30', '15:10:24', 0),
+(228, 2, 'e12a0322353a62bd7c2503150ba14e87', '2019-07-31', '14:10:58', '2019-07-31', '16:25:23', 0),
+(229, 2, '2994ff910dc0418df1c16c1f4868b558', '2019-07-31', '16:26:40', '2019-07-31', '16:26:42', 0),
+(230, 2, '249ea4eed40b8bee2f6ffbdac48b0779', '2019-07-31', '16:26:48', '2019-07-31', '16:37:02', 0),
+(231, 5, '54952c425c7b7a9bfb4580b63bba3c30', '2019-08-03', '15:44:05', '2019-08-03', '16:02:31', 0),
+(232, 5, '5e61e3c70ba8192bf7f750354803a350', '2019-08-04', '13:07:46', '2019-08-04', '13:19:29', 0),
+(233, 5, '6342d770d5f82c8ce7ffdfe290dc88f0', '2019-08-08', '15:59:21', '2019-08-08', '16:21:12', 0),
+(234, 5, '11a2aea83deb57c7dcf7540342cf7552', '2019-08-08', '16:21:39', '2019-08-08', '18:33:21', 0),
+(235, 2, '30e678c4b975be7be291a1f902a0b978', '2019-08-08', '18:33:32', '2019-08-08', '18:35:32', 0),
+(236, 2, 'e58660f16cd5a6eaabe767b40228b718', '2019-08-08', '19:09:44', '2019-08-08', '19:09:45', 0),
+(237, 2, '9c298ced38c93c62276aa22196e448ce', '2019-08-08', '19:11:49', '2019-08-08', '19:11:51', 0),
+(238, 5, '8924237b0d9bf7cdae29ef3793e645d1', '2019-08-08', '19:18:28', '2019-08-09', '14:44:35', 0),
+(239, 5, '17157d8bba12c4b806033c1cec8779cf', '2019-08-09', '14:44:48', '2019-08-09', '15:19:07', 0),
+(240, 5, '2f78715dc48dcc0c992bb9cd6de5befd', '2019-08-09', '15:19:24', '2019-08-09', '15:21:44', 0),
+(241, 5, '4aec4484962ab6d984f019a786c9a0e3', '2019-08-09', '15:21:50', '2019-08-09', '15:47:46', 0),
+(242, 2, '172bef768162103e362556750f047877', '2019-08-09', '15:47:51', '2019-08-09', '15:50:51', 0),
+(243, 5, 'c0463dd6e8a2b375936bb2a28eff8afc', '2019-08-09', '15:51:02', '2019-08-09', '16:36:35', 0),
+(244, 5, 'af359e9602992fe3dc40da18e8dfffc0', '2019-08-09', '16:36:53', '2019-08-09', '16:47:24', 0),
+(245, 58, '958c55fb6acfd776c2ed606d4cf9d529', '2019-08-10', '14:00:14', '2019-08-10', '14:00:19', 0),
+(246, 5, 'ad24bf749b9b4a7076aea37e02023aa1', '2019-08-10', '14:10:41', '2019-08-10', '23:16:42', 0),
+(248, 2, '2b2a882394598785b56c57297812fce1', '2019-08-11', '15:07:07', '0000-00-00', '00:00:00', 0),
+(249, 2, 'a876cacd44c1dac01516c1cb6fa8c5fa', '2019-08-11', '15:11:43', '0000-00-00', '00:00:00', 0),
+(250, 2, '3a3a7553557f38bbf78da4da394ae2b9', '2019-08-11', '15:24:23', '0000-00-00', '00:00:00', 0),
+(252, 2, '1ed5fe115530c3411e8ac9faf1bcb4ad', '2019-08-11', '15:30:14', '0000-00-00', '00:00:00', 0),
+(253, 2, '8aafaead9b169ec9a2bd6da5666aa9c1', '2019-08-11', '15:34:58', '0000-00-00', '00:00:00', 0),
+(255, 2, 'f3cdb0970626fed614d85e4a720f3dbf', '2019-08-11', '15:39:18', '0000-00-00', '00:00:00', 1),
+(256, 63, '572bc9570b9f73224bffd6c81a8a5d83', '2019-08-11', '16:10:00', '2019-08-11', '16:10:13', 0),
+(257, 63, '9ed9a6d729e3f881f6d62ab2101c38f8', '2019-08-12', '00:42:31', '0000-00-00', '00:00:00', 1),
+(258, 5, 'f430da1d2d55cc70a5c24b9932322c02', '2019-08-12', '01:43:55', '2019-08-12', '16:45:58', 0),
+(259, 5, 'acc4bace8045d97170f7c46aa8396ea5', '2019-08-13', '15:43:23', '0000-00-00', '00:00:00', 0),
+(260, 5, 'aaf7a1ad647782b5710559c58e499125', '2019-08-14', '17:26:00', '2019-08-14', '18:18:54', 0),
+(261, 5, '40bebc4ce553204b821c172516e2b97b', '2019-08-14', '18:21:34', '2019-08-15', '10:33:07', 0),
+(262, 5, '204c04fddd914e6e3110656b85dacf2c', '2019-08-15', '13:43:39', '0000-00-00', '00:00:00', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `subject`
+--
+
+CREATE TABLE `subject` (
+  `id` int(11) NOT NULL,
+  `subjectname` varchar(55) NOT NULL,
+  `datecreated` date NOT NULL,
+  `sortval` int(11) NOT NULL,
+  `status` int(2) NOT NULL DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `subject`
+--
+
+INSERT INTO `subject` (`id`, `subjectname`, `datecreated`, `sortval`, `status`) VALUES
+(1, 'rap', '2019-07-30', 2, 1),
+(2, 'rock', '2019-07-30', 3, 1),
+(3, 'pop', '2019-07-30', 4, 1),
+(4, 'country', '2019-08-03', 6, 1),
+(5, 'electronic', '2019-08-03', 5, 1),
+(6, 'history', '2019-08-03', 7, 1),
+(7, 'all', '2019-08-03', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -1132,6 +1223,31 @@ INSERT INTO `tracks` (`trackname`, `trackid`, `active`) VALUES
 ('Feel So Close', 25, 1),
 ('We Found Love', 26, 1);
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `userquestions`
+--
+
+CREATE TABLE `userquestions` (
+  `id` int(11) NOT NULL,
+  `custid` int(11) NOT NULL,
+  `questionid` int(11) NOT NULL,
+  `answer` varchar(155) NOT NULL,
+  `status` int(11) NOT NULL DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `userquestions`
+--
+
+INSERT INTO `userquestions` (`id`, `custid`, `questionid`, `answer`, `status`) VALUES
+(1, 2, 2, 'ralph', 1),
+(2, 3, 1, 'black', 1),
+(4, 52, 2, 'lucy', 1),
+(5, 5, 4, 'italy', 1),
+(14, 63, 4, 'mexico', 1);
+
 --
 -- Indexes for dumped tables
 --
@@ -1161,6 +1277,12 @@ ALTER TABLE `category`
   ADD PRIMARY KEY (`categoryid`);
 
 --
+-- Indexes for table `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `country`
 --
 ALTER TABLE `country`
@@ -1177,6 +1299,12 @@ ALTER TABLE `creditcard`
 --
 ALTER TABLE `customer`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `discussion`
+--
+ALTER TABLE `discussion`
+  ADD PRIMARY KEY (`postid`);
 
 --
 -- Indexes for table `email`
@@ -1227,9 +1355,21 @@ ALTER TABLE `province`
   ADD PRIMARY KEY (`provinceid`);
 
 --
+-- Indexes for table `securityquestions`
+--
+ALTER TABLE `securityquestions`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `session`
 --
 ALTER TABLE `session`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `subject`
+--
+ALTER TABLE `subject`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -1239,6 +1379,12 @@ ALTER TABLE `tracks`
   ADD PRIMARY KEY (`trackid`);
 
 --
+-- Indexes for table `userquestions`
+--
+ALTER TABLE `userquestions`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -1246,7 +1392,7 @@ ALTER TABLE `tracks`
 -- AUTO_INCREMENT for table `address`
 --
 ALTER TABLE `address`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 --
 -- AUTO_INCREMENT for table `album`
 --
@@ -1263,6 +1409,11 @@ ALTER TABLE `artistgroup`
 ALTER TABLE `category`
   MODIFY `categoryid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
+-- AUTO_INCREMENT for table `comments`
+--
+ALTER TABLE `comments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+--
 -- AUTO_INCREMENT for table `country`
 --
 ALTER TABLE `country`
@@ -1276,7 +1427,12 @@ ALTER TABLE `creditcard`
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+--
+-- AUTO_INCREMENT for table `discussion`
+--
+ALTER TABLE `discussion`
+  MODIFY `postid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 --
 -- AUTO_INCREMENT for table `email`
 --
@@ -1286,27 +1442,27 @@ ALTER TABLE `email`
 -- AUTO_INCREMENT for table `orderdetails`
 --
 ALTER TABLE `orderdetails`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 --
 -- AUTO_INCREMENT for table `orderpayment`
 --
 ALTER TABLE `orderpayment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1018;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1030;
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5015;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5033;
 --
 -- AUTO_INCREMENT for table `ordership`
 --
 ALTER TABLE `ordership`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 --
 -- AUTO_INCREMENT for table `phone`
 --
 ALTER TABLE `phone`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 --
 -- AUTO_INCREMENT for table `phonetype`
 --
@@ -1318,15 +1474,30 @@ ALTER TABLE `phonetype`
 ALTER TABLE `province`
   MODIFY `provinceid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 --
+-- AUTO_INCREMENT for table `securityquestions`
+--
+ALTER TABLE `securityquestions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+--
 -- AUTO_INCREMENT for table `session`
 --
 ALTER TABLE `session`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=200;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=263;
+--
+-- AUTO_INCREMENT for table `subject`
+--
+ALTER TABLE `subject`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 --
 -- AUTO_INCREMENT for table `tracks`
 --
 ALTER TABLE `tracks`
   MODIFY `trackid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+--
+-- AUTO_INCREMENT for table `userquestions`
+--
+ALTER TABLE `userquestions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

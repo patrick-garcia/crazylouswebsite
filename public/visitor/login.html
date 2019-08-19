@@ -1,46 +1,43 @@
 <?= successMsg() ?>
 
 <div class="container" id="login-container">
-  <div class="row">
-    <div class="col-md-6 col-sm-12">
-      <div class="card box-shadow p-4 text-secondary">
-        <h2 class="box-shadow rounded">Crazy Lou's Website</h2>
-        <form action="" method="POST" class="mx-3">
-          <div class="form-group pt-4 pb-2">
-            <label class="pl-2" for="userlogin">username</label>
-            <input type="email" class="form-control" placeholder="email address" name="userlogin"
-              value="<?= isset($login->user) ? $login->user : '' ?>">
-            <?= errorIssetCheck('userlogin') ?>
-          </div>
-          <div class="form-group">
-            <label class="pl-2" for="passlogin">password</label>
-            <input type="password" class="form-control" placeholder="password" name="passlogin"
-              value="<?= isset($login->pass) ? $login->pass : '' ?>">
-            <?= errorIssetCheck('passlogin') ?>
-            <?= isset($errors['incorrectLogin']) ? '<p class="text-danger small">' . $errors['incorrectLogin'] . '</p>' : ''; ?>
-          </div>
-          <div class="form-group pt-2 ml-2">
-            <button type="submit" class="btn btn-primary" name="loginsubmit">sign in</button>
-          </div>
-        </form> <!-- end of form -->
-        <div class="dropdown-divider mx-4"></div>
-        <div class="row" id="new-user">
-          <div class="mt-4 mr-4 pr-4">
-            <span class="ml-2">first time here? </span><a href="create.php">create an account</a>
-          </div>
-        </div> <!-- end of row -->
+  <div class="col-sm-12 col-md-9 col-lg-7 card box-shadow p-4 mb-4">
+    <h2 class="box-shadow rounded d-flex justify-content-center align-items-center"><?= $site['name']?></h2>
+    <form action="" method="POST" class="text-secondary mx-3">
+      <div class="form-group pt-4 pb-2">
+        <label class="pl-2" for="userlogin">username</label>
+        <input type="email" class="form-control" placeholder="email address" name="userlogin"
+          value="<?= isset($login->username) ? $login->username : '' ?>">
+        <?= errorIssetCheck('userlogin') ?>
+      </div>
+      <div class="form-group">
+        <label class="pl-2" for="passlogin">password</label>
+        <input type="password" class="form-control" placeholder="password" name="passlogin"
+          value="<?= isset($login->password) ? $login->password : '' ?>">
+        <?= errorIssetCheck('passlogin') ?>
+        <?= isset($errors['incorrectLogin']) ? '<p class="text-danger small">' . $errors['incorrectLogin'] . '</p>' : ''; ?>
+      </div>
+      <div class="form-group pt-2 ml-2">
+        <button type="submit" class="btn btn-primary" name="loginsubmit">sign in</button>
+      </div>
+      <div class="d-flex justify-content-end small">
+        <div class="">
+          <span class="">first time here? </span><a href="create.php">create an account</a>
+        </div>
+      </div> <!-- end of row -->
 
-        <!-- **** -->
-        <div class="row" id="new-user">
-          <div class="mt-2 mr-4 pr-4">
-            <span class="ml-2">already a member? </span><a href="reset.php">forgot password</a>
-          </div>
-        </div> <!-- end of row -->
-        <!-- **** -->
+      <!-- **** -->
+      <div class="d-flex justify-content-end small mt-1">
+        <div class="">
+          <span class="">already a member? </span><a href="reset.php">forgot password</a>
+        </div>
+      </div> <!-- end of row -->
+    </form> <!-- end of form -->
+    
+    <!-- **** -->
 
-      </div> <!-- end of card -->
-    </div> <!-- end of col -->
-  </div>
+  </div> <!-- end of card -->
+
 </div> <!-- end of container -->
 </body>
 </html>
