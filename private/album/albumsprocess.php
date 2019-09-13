@@ -1,9 +1,9 @@
 <?php
 !isset($_SESSION) ? session_start() : NULL;
 include_once 'data/dbfile.php';
-include_once 'albumsutil.php';
 include_once 'private/util/variables.php';
 include_once 'private/util/functions.php';
+include_once 'albumsutil.php';
 
 if(!isset($_SESSION['loggedID'])) {
   exit(header("location: index.php"));

@@ -1,7 +1,7 @@
 let disc = {
-  titleInput:         [...document.getElementsByName("titleNewPost")],
-  textInput:          [...document.getElementsByName("textNewPost")],
-  btn:                [...document.getElementsByName("btnNewPost")],
+  titleInput:         document.getElementsByName("titleNewPost"),
+  textInput:          document.getElementsByName("textNewPost"),
+  btn:                document.getElementsByName("btnNewPost"),
   titlePostError:     document.getElementById('titleposterror'),
   textPostError:      document.getElementById('textposterror'),
   events:             ['change', 'mouseleave']

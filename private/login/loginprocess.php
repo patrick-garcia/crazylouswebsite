@@ -29,8 +29,6 @@ if(isset($_SESSION['loggedID'])) {
   }}
 }
 
-// required for password reset section
-$_SESSION['prevUrl'] = $_SERVER['REQUEST_URI'];
 
 ?>
 

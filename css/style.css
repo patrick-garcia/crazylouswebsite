@@ -1,6 +1,6 @@
 /* login */
 .login-bg-color {
-  background: linear-gradient(to right top, #ededed, #ededee, #ecedef, #eaedf0, #e8eef1, #e8eff2, #e8f1f3, #e8f2f4, #eaf5f7, #ebf7f9, #edfafc, #effcff) fixed;
+  background: url(../img/turntable.jpg) no-repeat center;
 }
 
 #login-container {
@@ -20,7 +20,8 @@
 
 #login-container div.card {
   padding-bottom: 3rem !important;
-  background: rgba(255,255,255,.9);
+  background: rgba(255,255,255,.8);
+  border-radius: 6px;
 }
 
 #recruiter-checkbox {
@@ -36,6 +37,14 @@ label[for=recruiter-checkbox] {
   #login-container h2 {
     font-size: 24px;
     text-align: center;
+  }
+
+  #login-container form {
+    margin: 0 !important;
+  }
+
+  #login-container form div:nth-child(4) {
+    margin-top: 24px !important;
   }
 }
 
@@ -263,6 +272,20 @@ form[name="payment"] {
     padding: 0;
 }}
 
+@media (max-width: 500px) {
+  div.comment-post blockquote {
+    font-size: 14px !important;
+  }
+}
+
+div.comment-post div:nth-child(3) {
+  transform: translate(-6px, 8px)
+}
+
+div.comment-post div:nth-child(3) span {
+  cursor: pointer;
+}
+
 /* contact */
 @media (min-width: 500px) {
   #contact-container div.row div.card {
@@ -278,4 +301,112 @@ form[name="payment"] {
 .happy-font-awesome::after {
   content: "\f118";
   font-family: "Font Awesome 5 Free";
+}
+
+/* admin */
+#admin-container > div > div {
+  min-height: 70vh;
+}
+
+#admin-container main a:first-child span::before{
+  font-family: "Font Awesome 5 Free";
+  content: '\f007';
+  margin-right: 8px;
+}
+
+#admin-container main a:nth-child(2) span::before{
+  font-family: "Font Awesome 5 Free";
+  content: '\f4ad';
+  margin-right: 8px;
+}
+
+#admin-container main a:nth-child(3) span::before{
+  font-family: "Font Awesome 5 Free";
+  content: '\f086';
+  margin-right: 8px;
+}
+
+#admin-container main a:hover {
+  text-decoration: none;
+  color: steelblue !important;
+  text-shadow: 1px 1px 1px rgba(10, 10, 10, .25)
+}
+
+/* user management */
+.switch {
+  position: relative;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {display:none;}
+
+.slider {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  cursor: pointer;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input.primary:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* new subject  */
+#newsubj-container {
+  min-height: 70vh;
+}
+
+@media (max-width: 500px) {
+  #newsubj-title {
+    display: block !important;
+  }
+
+  #newsubj-title h4 {
+    margin-bottom: 8px !important;
+  }
+}
+
+/* discussion admin */
+@media (max-width: 575px) {
+  #disadmin-container .user-column, #disadmin-container .title-column {
+    display: none;
+  }
+}
+
+#disadmin-container span[data-remove] {
+  cursor: pointer;
 }

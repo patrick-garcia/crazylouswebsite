@@ -1,6 +1,14 @@
 <?php
 
-class OrderClass {
+class SeletedAlbumID {
+  static public $idArray;
+  
+  public function __construct($albumIDs) {
+    SELF::$idArray = $albumIDs;
+  }
+}
+
+class OrderClass extends SeletedAlbumID {
   public $selectedAlbumID;
   public $startSubTotal = 0;
   public $order = [];
@@ -8,9 +16,8 @@ class OrderClass {
   public $totalsArray = [];
   public $totalsArrayNames = ['sub', 'tax', 'total'];
     
-  public function __construct($param) {
-    $this->selectedAlbumID = $param;
-    $this->addAlbumidToOrder($this->selectedAlbumID);
+  public function __construct() {
+    $this->addAlbumidToOrder(PARENT::$idArray);
   }
   
   public function addAlbumidToOrder($albumIDArray) {
@@ -31,8 +38,10 @@ class OrderClass {
       $newArray = explode(',', $input);
       $this->createTotalsArray($newArray);
 
-    } else $this->createTotalsArray($input);
-
+    } else {
+      $this->createTotalsArray($input);
+    }
+    
     $_SESSION['payTotals'] = $this->totalsArray;
   }
 
@@ -41,7 +50,20 @@ class OrderClass {
       $this->totalsArray[$this->totalsArrayNames[$key]] = $val;
     }
   }
+}
 
+class OrderMessage {
+  static public $msg = 'no album selected, please go back to album section ';
+}
+
+class Subscriber {
+  static function subscriberCheck() {
+    $id = $_SESSION['loggedID'];
+    global $con; moreResCheck($con);
+    $sql = "CALL profile_subscriber_check($id)";
+    $result = $con->query($sql)->fetch_assoc();
+    return $result['subscriber'];
+  }
 }
 
 ?>

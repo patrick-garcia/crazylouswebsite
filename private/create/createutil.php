@@ -39,7 +39,6 @@ class PhoneClass extends NameClass {
   public $num1, $ext1, $type1;
   public $num2, $ext2, $type2;
   
-  // function insertPhone($num, $ext, $type, $custid) {
   function insertPhone($num, $ext, $type) {
     $custid = PARENT::$lastid;
     global $con; moreResCheck($con);
@@ -54,7 +53,6 @@ class PhoneClass extends NameClass {
 class SecurityQuestionClass extends NameClass {
   public $question, $answer;
 
-  // public function insertUserQuestion($custid, $questionid, $answer) {
   public function insertUserQuestion($questionid, $answer) {
     $custid = PARENT::$lastid;
     global $con; moreResCheck($con);

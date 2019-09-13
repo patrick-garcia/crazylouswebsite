@@ -1,79 +1,58 @@
 <div class="container container-min-height" id="reset-container">
   <div class="row d-flex justify-content-center mt-4">
-    <div class="col-md-10 col-xs-12">
+    <div class="col-md-10 col-sm-12">
       <form action="" method="POST" class="m-4">
         <h3 class="mb-4">Password Reset</h3>
         <div class="form-row">
-          <div class="form-group col-md-8 col-sm-10">
-            <label class="" for="resetemail">Email Address</label>
-            <input type="email" class="form-control" placeholder="email address" name="resetEmailInput"
-              value="<?= isset($_POST['resetEmailInput']) ? $_POST['resetEmailInput'] : '' ?> ">
+          <div class="form-group col-md-8 col-sm-10 mb-2">
+            <label for="resetemail">email address</label>
+            <input type="email" class="form-control form-control-sm" placeholder="email address" name="resetEmailInput"
+              value="<?= isset($_POST['resetEmailInput']) ? $_POST['resetEmailInput'] : '' ?> "
+            >
           </div>
-          <div class="form-group col-md-2 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary ml-2" name="emailCheckBtn">submit</button>
-            <span class="p-2 ml-1 text-success"><?= $_SESSION['check1'] == 1 ? $message->checkmark : '' ?></span>
+          <div class="form-group col-md-2 d-flex align-items-end mb-2">
+            <a href="#" class="btn btn-sm btn-primary" data-resetBtn data-emailChk name="emailCheckBtn">submit</a>
+            <span class="py-1 pl-2 text-success checkmark" id="check1" data-checkmark></span>
           </div>
         </div> <!-- end of email row -->
         <?= errorIssetCheck('resetemail') ?>
-        <?= displayMsgInvResult($message->msg1) ?>
+        <p class="text-danger small input-msgs"></p>
 
         <div class="form-row">
           <div class="form-group col-md-8 col-sm-10">
-            <label class="" for="resetemail">
-              <?= $_SESSION['check1'] == 1 ? $_SESSION['questionString'] : 'Security Question' ?>
-            </label>
-            <input type="text" class="form-control" placeholder="answer" name="resetAnswerInput"
+            <label id="questionString" for="resetAnswerInput">security question</label>
+            <input type="text" class="form-control form-control-sm" placeholder="answer" name="resetAnswerInput"
               value="<?= isset($_POST['resetAnswerInput']) && $_SESSION['check1'] != 0 ?
                 $_POST['resetAnswerInput'] : '' ?>"
-              <?= $_SESSION['check1'] == 0 ? 'readonly' : '' ?>
+              disabled
             >
           </div>
           <div class="form-group col-md-2 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary ml-2" name="answerCheckBtn" 
-              <?= $_SESSION['check1'] == 0 ? 'disabled' : '' ?> >
+            <button type="submit" class="btn btn-sm btn-primary" data-resetBtn data-questionChk name="answerCheckBtn" disabled>
               submit
             </button>
-            <span class="p-2 ml-1 text-success">
-              <?= $_SESSION['check1'] == 1 && $_SESSION['check2'] == 1 ? $message->checkmark : '' ?>
-            </span>
+            <span class="py-1 pl-2 text-success checkmark" id="check2"></span>
           </div>
         </div> <!-- end of security question row -->
         <?= errorIssetCheck('resetanswer') ?>
-        <?= displayMsgInvResult($message->msg2) ?>
+        <p class="text-danger small input-msgs"></p>
         
         <div class="form-row">
           <div class="form-group col-md-8 col-sm-10">
-            <label class="" for="passInput1">New Password</label>
-            <input type="text" class="form-control" placeholder="new password" name="passInput1" 
-              value="<?= isset($_POST['passInput1']) && $_SESSION['check2'] != 0 ? $_POST['passInput1'] : '' ?>"
-              <?= $_SESSION['check1'] == 1 && $_SESSION['check2'] == 1 ? '' : 'readonly' ?>
-            >
-            <?php
-              echo errorIssetCheck('passOne');
-              if(isset($errors['passCheck']) && !isset($errors['passOne']) && !isset($errors['passTwo'])) {
-                echo '<p class="text-danger small">' . $errors['passCheck'] . '</p>';
-              }
-            ?>
-            <?= displayMsgInvResult($message->msg3) ?>
+            <label class="" for="passInput1">new password</label>
+            <input type="text" class="form-control form-control-sm" placeholder="new password" name="passInput1"  value="" disabled>
+            <p class="text-danger small input-msgs"></p>
           </div>
           <div class="form-group col-md-8 col-sm-10">
-            <label class="" for="passInput2">Confirm Password</label>
-            <input type="text" class="form-control" placeholder="confirm password" name="passInput2"
-              value="<?= isset($_POST['passInput2']) && $_SESSION['check2'] != 0 ? $_POST['passInput2'] : '' ?>"
-              <?= $_SESSION['check1'] == 1 && $_SESSION['check2'] == 1 ? '' : 'readonly' ?>
-            >
-            <?= errorIssetCheck('passTwo') ?>
+            <label class="" for="passInput2">confirm password</label>
+            <input type="text" class="form-control form-control-sm" placeholder="confirm password" name="passInput2" value="" disabled>
+            <p class="text-danger small input-msgs"></p>
           </div>
         </div> <!-- end of row -->
         <div class="form-row mt-2">
           <div class="form-group col-md-4 d-flex">
-            <button type="submit" class="btn btn-primary mr-2" name="resetPassBtn"
-              <?= $_SESSION['check1'] == 1 && $_SESSION['check2'] == 1 ? '' : 'disabled' ?> >
-              update pasword
-            </button>
-          <!-- </div>
-          <div class="form-group col-md-4"> -->
-            <button type="submit" class="btn btn-secondary" name="resetBackToLogin">back to login</button>
+            <button type="submit" class="btn btn-sm btn-primary mr-2" name="resetPassBtn" disabled>update pasword</button>
+            <button type="submit" class="btn btn-sm btn-secondary" name="resetBackToLogin">back to login</button>
           </div>
         </div> <!-- end of row -->
       </form>
@@ -81,3 +60,5 @@
   </div>
 </div>
 
+<!-- **** -->
+<script type="text/javascript" src="js/resetajax.js"></script>

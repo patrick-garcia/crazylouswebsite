@@ -87,5 +87,4 @@ function cardsOptions() {
   foreach($creditcard as $card) echo '<option value="' . $card . '">' . strtoupper($card) . '</option>';
 }
 
-
 ?>

@@ -94,7 +94,6 @@ class NewOrderDetails {
     $sql = "CALL orderdetails_insert($lastid, $albumid, $price, $qty)";
     $con->query($sql);
     SELF::$rowCheck = $con->affected_rows ? $con->affected_rows : 0;
-    $_SESSION['tes11'] = $con->affected_rows ? $con->affected_rows : 0;
   }
 }
 
@@ -139,7 +138,5 @@ class NewShipToOrder {
 class MessageClass {
   static public $incompleteMsg = '<td>order incomplete: please go back to order section</td>';
 }
-
-
 
 ?>

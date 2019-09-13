@@ -13,6 +13,7 @@ if(!isset($_SESSION['loggedID'])) {
   $edtTgl = ['name' => 0, 'pass' => 0, 'adrs' => 0, 'phone' => 0, 'question' => 0];
   !isset($profile) ? $profile = new ProfileClass($_SESSION['loggedID']) : NULL;
   $loadprofile = new LoadProfile($_SESSION['loggedID']);
+
 }
 
 // edit name & email
@@ -162,6 +163,5 @@ function displayEditBtnToggle($editVal, $attr1, $text1, $attr2, $text2) {
   } else {
     return '<button type="submit" class="btn btn-success profile-edit-btn" name="' . $attr2 . '">' . $text2 . '</button>';
 }}
-
 
 ?>

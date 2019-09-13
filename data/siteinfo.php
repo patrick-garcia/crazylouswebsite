@@ -14,8 +14,7 @@
 
   $student = [];
   $student['Name'] = 'Patrick Garcia';
-  //$student['Student ID'] = '101045030';
-
+  
   $contact = [];
   $contact['Email'] = [
     'display' => 'garciajpatrick@gmail.com',

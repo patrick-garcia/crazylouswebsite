@@ -139,7 +139,7 @@
       <div class="form-group mr-3" id="pay-btn">
         <a href="order.php" class="btn btn-outline-primary mr-3">go to order</a>
         <?php if(!empty($_SESSION['payTotals'])) { ?>
-        <button type="submit" class="btn btn-success" name="confirmOrder" <?= disableBtn($_SESSION['orderDetails']) ?> >confirm order</button>
+          <button type="submit" class="btn btn-success" name="confirmOrder" <?= disableBtn($_SESSION['orderDetails']) ?> >confirm order</button>
         <?php } ?>
       </div>
     </div> <!-- end of btn row-->

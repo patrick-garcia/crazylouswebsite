@@ -2,33 +2,34 @@ let order = {
   taxRate: 13, // use whole number, converted into decimal inside function
   subtotal: '',
   albumQtys: [...document.getElementsByClassName('qtyOfEachItem')],
-  unitPrice: [...document.getElementsByClassName('hiddenUnitPrice')],
+  unitPriceEach: [...document.querySelectorAll('[data-unitprice]')],
   unitPriceArray: [],
   events: ["DOMContentLoaded", "change"]
 }
 
 order.startVals = function() {
-  this.unitPrice.forEach(elem => this.unitPriceArray.push(elem.value))
+  this.unitPriceEach.forEach(elem => {
+    this.unitPriceArray.push(elem.dataset.unitprice)
+  })
 }
 
 order.updateEachAlbumTotal = function() {
   this.albumQtys.forEach((val, ind) => {
     let name1 = 'linePrice' + (ind + 1);
-    let name2 = 'linePriceHidden' + (ind + 1);
-    let name3 = 'qtyHidden' + (ind + 1);
+    let name2 = `[data-albumrow="${ind + 1}"]`
     let qty = val.value;
     let price = this.unitPriceArray[ind];
     document.getElementsByName(name1)[0].innerHTML = (qty * price).toFixed(2);
-    document.getElementsByName(name2)[0].value = (qty * price).toFixed(2);
-    document.getElementsByName(name3)[0].value = qty;
+    document.querySelector(name2).setAttribute('data-qty', qty)
   })
 }
 
 order.getQty = function() {
-  let getQty = [...document.getElementsByClassName('hiddenQty')];
+  let qtyOfEach = [...document.querySelectorAll('[data-albumrow]')]
   let arrayQty = [];
-  getQty.forEach((item) => {
-    let val = parseInt(item.value);
+
+  qtyOfEach.forEach((item) => {
+    let val = parseInt(item.dataset.qty);
     arrayQty.push(val);
   })
 
@@ -36,19 +37,24 @@ order.getQty = function() {
 }
 
 order.updateSubtotalVal = function() {
-  let unitPriceUpdated = [...document.getElementsByClassName('hiddenUnitPrice')];
+  let unitPriceUpdated = [...document.getElementsByClassName('updatedLinePrices')];
   let unitPriceArrayUpdated = [];
+
   unitPriceUpdated.forEach(elem => {
-    unitPriceArrayUpdated.push(elem.value)
+    let stringToNum = parseFloat(elem.innerText).toFixed(2)
+    unitPriceArrayUpdated.push(stringToNum)
   })
 
-  this.subtotal = unitPriceArrayUpdated.reduce(function (total, currVal) {
+  this.subtotal = unitPriceArrayUpdated.reduce((total, currVal) => {
     return (parseFloat(total) + parseFloat(currVal)).toFixed(2);
   })
 }
 
 // push vals to html
 order.displayTotals = function() {
+  let subtotalElem = document.getElementById('subtotal');
+  subtotalElem.innerHTML = this.subtotal;
+
   let taxElem = document.getElementById('tax');
   let tax = parseFloat(this.subtotal * (this.taxRate / 100)).toFixed(2);
   taxElem.innerHTML = tax;
@@ -56,9 +62,6 @@ order.displayTotals = function() {
   let finalTotalElem = document.getElementById('finalTotal');
   let finalTotal = (parseFloat(this.subtotal) + parseFloat(tax)).toFixed(2);
   finalTotalElem.innerHTML = finalTotal;
-
-  let hiddenElem = document.getElementById('finalTotalHidden');
-  hiddenElem.value = finalTotal;
 }
 
 order.getTotals = function () {
@@ -80,12 +83,8 @@ order.runCalc = function() {
   this.getTotals();
 }
 
-//run at start
-function init() {
-  order.startVals()
-}
-
-init();
+//  *** load 
+window.onload = order.startVals()
 
 order.events.forEach(evt => {
   window.addEventListener(evt, () => {

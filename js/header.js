@@ -33,7 +33,7 @@ function splitUrlArray(urlArr) {
 }
 
 // onload ****
-window.addEventListener("DOMContentLoaded", function() {
+window.addEventListener("load", function() {
   addBgToBody();
   highlightNavLink();
 }, false);

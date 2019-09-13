@@ -39,8 +39,7 @@ class LoadProfile {
     $sql = "CALL profile_load_phone($id)";
     $result = $con->query($sql) or die($con->error);
     while($item = $result->fetch_assoc()) array_push($this->phoneArray, $item);
-  }
-  
+  } 
 }
 
 class ProfileClass {
@@ -116,6 +115,17 @@ class SecurityQuestionClass {
     $sql = "CALL profile_update_question('$question', '$answer', $this->id)";
     $con->query($sql);
   } 
+}
+
+class Subscriber {
+
+  static function subscriberCheck() {
+    $id = $_SESSION['loggedID'];
+    global $con; moreResCheck($con);
+    $sql = "CALL profile_subscriber_check($id)";
+    $result = $con->query($sql)->fetch_assoc();
+    return $result['subscriber'];
+  }
 }
 
 ?>

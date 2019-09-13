@@ -12,10 +12,11 @@ if(!isset($_SESSION['loggedID'])) {
 
 } else {
   if(!empty($_SESSION['orderalbumID'])) {
-    !isset($odr) ? $odr = new OrderClass($_SESSION['orderalbumID']) : '';
+    new SeletedAlbumID($_SESSION['orderalbumID']);
+    !isset($odr) ? $odr = new OrderClass : '';
 
   } else {
-    $_SESSION['message'] = 'no album selected, please go back to album section ';
+    $_SESSION['message'] = OrderMessage::$msg;
   }  
 }
 
@@ -40,3 +41,4 @@ function qty_load($max = 10) {
 }}
 
 ?>
+

@@ -3,8 +3,14 @@
 <div class="container container-min-height" id="profile-container">
   <div class="col-md-12">
     <div class="card box-shadow text-secondary">
-      <div class="row mt-3 mx-4">
+      <div class="row mt-3 mx-4 d-flex justify-content-between">
         <h3 class="">My Profile</h3>
+        <div class="">
+          <?php if (Subscriber::subscriberCheck()) { ?>
+            <span class="small mr-1 text-uppercase font-italic">subscriber</span>
+            <i class="far fa-check-circle text-success"></i>
+          <?php } ?>
+        </div>
       </div> <!-- end of h2 div -->
       <form action="" method="POST" class="m-4">
 

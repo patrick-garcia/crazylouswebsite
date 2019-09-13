@@ -39,10 +39,10 @@ if(isset($_POST['btnNewPost'])) {
 
 // sort/filter
 if(isset($_POST['subjecttitle'])) {
-  $subj->subjectVal = $_POST['subjecttitle'];
+  $subj->subjVal = $_POST['subjecttitle'];
 
-  if($subj->subjectVal != 7) {
-    $posts->rows = $posts->loadDiscPostsBySubj($subj->subjectVal);
+  if($subj->subjVal != 7) {
+    $posts->rows = $posts->loadDiscPostsBySubj($subj->subjVal);
 
   } else {
     $posts->rows = $posts->loadDiscussionPosts();

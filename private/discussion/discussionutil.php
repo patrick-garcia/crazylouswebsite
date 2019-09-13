@@ -90,13 +90,34 @@ class DiscussionClass {
     while($item = $result->fetch_assoc()) array_push($resArray, $item);
     return $resArray;
   }
+}
 
-  public function displayUsername($userid) {
+class DisplayName {
+  static function username($userid) {
     global $con; moreResCheck($con);
     $sql = "CALL discussion_get_username($userid)";
     $result = $con->query($sql)->fetch_assoc();
+    $expert = $result['expert'] ? '<i class="fas fa-user-graduate ml-2"></i>' : '';
     $username = $result['firstname'] . ' ' . $result['lastname'][0] . '.';
+    $username .= $expert;
     return $username ;
+  }
+
+  static function username2($userid) {
+    global $con; moreResCheck($con);
+    $sql = "CALL discussion_get_username($userid)";
+    $result = $con->query($sql)->fetch_assoc();
+    $expert = $result['expert'] ? '<i class="fas fa-user-graduate mr-2"></i>' : '';
+    $username = $expert;
+    $username .= $result['firstname'] . ' ' . $result['lastname'][0] . '.';
+    return $username;
+  }
+
+  static function adminCheck($id) {
+    global $con; moreResCheck($con);
+    $sql = "CALL admin_check($id)";
+    $result = $con->query($sql)->fetch_assoc() or die($con);
+    return $result['admin'];
   }
 }
 
@@ -128,7 +149,6 @@ class NewCommentClass {
     $con->query($sql);
     $con->affected_rows ? $this->valCheckforMsg = $con->affected_rows : 0;
   }
-    
 }
 
 ?>

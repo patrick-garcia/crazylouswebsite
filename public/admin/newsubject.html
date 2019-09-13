@@ -1,0 +1,53 @@
+<?= successMsg() ?>
+
+<div class="container d-flex justify-content-center text-secondary" id="newsubj-container">
+  <div class="card box-shadow col-sm-12 col-md-10 col-lg-8">
+    <div class="row d-flex justify-content-between align-items-center m-0 px-4 pt-4" id="newsubj-title">
+      <h4 class="m-0">Discusion Subjects</h4>
+      <div>
+        <a class="btn btn-sm btn-outline-info" data-toggle="collapse" href="#newsubj-form" role="button">add subject</a>
+        <a href="<?= $adminCheck == 1 ? 'admin.php' : 'discussion.php' ?>" class="btn btn-sm btn-outline-secondary">back</a>
+      </div>
+    </div>
+
+    <div class="row px-4">
+      <div class="col-sm-12 collapse my-3" id="newsubj-form">
+        <div class="card-body box-shadow">
+          <form action="" method="POST" class="m-0">
+            <div class="form-row">
+              <div class="form-group col-sm-12 col-md-9 mb-0">
+                <label class="font-italic ml-2" for="newSubjField">new subject</label>
+                <input type="text" class="form-control" name="newSubjField" placeholder="new subject">
+                <p class="text-danger small" id="subjposterror"></p>
+              </div>
+            </div> <!-- end of field row -->
+            <div class="form-row">
+              <button type="submit" name="btnNewSubj" class="btn btn-sm btn-primary ml-1 mt-2" disabled>add subject</button>
+              <a class="btn btn-sm btn-outline-secondary ml-2 mt-2" data-toggle="collapse" href="#newsubj-form" role="button">close</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div> <!-- end of row -->
+
+    <div class="card p-4">
+      <table class="table table-striped" id="newsubject-table">
+        <tbody>
+          <tr>
+            <th>subject</th>
+            <th># of posts</th>
+          </tr>
+          <?php foreach(SubjectClass::$subjectArr as $key => $val): ?>
+            <tr>
+              <td><?= $val['subjectname'] ?></td>
+              <td><?= $val['post_count'] ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>      
+  </div> <!-- end of card -->
+</div> <!-- end of container -->
+
+<!-- ****  -->
+<script type="text/javascript" src="js/newsubject.js"></script>

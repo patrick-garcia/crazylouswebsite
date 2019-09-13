@@ -1,0 +1,13 @@
+nav
+- text-center on mobile
+
+order
+- refactor hidden inputs with ajax calls
+
+password reset
+- ajax
+
+albums
+- use ajax for adding items to cart
+
+prototype
